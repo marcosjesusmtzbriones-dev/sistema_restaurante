@@ -3,15 +3,17 @@
     --accent-gold: #c5a059;
     --greek-blue: #1b3a5d;
     --soft-white: #f8f9fa;
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-bg: rgba(10, 25, 47, 0.95); 
+    --glass-border: rgba(197, 160, 89, 0.3);
 }
 
 body {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    background: #0f172a;
+    background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
     background-attachment: fixed;
     color: var(--soft-white);
-    font-family: 'Segoe UI', Roboto, sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    overflow-x: hidden;
 }
 
 .bg-greek-blue {
@@ -21,24 +23,22 @@ body {
 
 .glass-card {
     background: var(--glass-bg);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
     border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .form-control {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
-    color: #ffffff !important; /* Texto siempre blanco */
-}
-
-.form-control::placeholder {
-    color: rgba(255, 255, 255, 0.5) !important;
+    color: #ffffff !important;
+    font-size: 16px !important;
 }
 
 select#s-it option {
-    background-color: #1e293b !important;
+    background-color: #1a1a1a !important;
     color: #ffffff !important;
 }
 
@@ -47,6 +47,7 @@ select#s-it option {
     border: none !important;
     color: #1a1a1a !important;
     font-weight: bold;
+    padding: 0.8rem;
 }
 
 .btn-outline-gold {
@@ -54,15 +55,10 @@ select#s-it option {
     color: var(--accent-gold) !important;
 }
 
-.btn-outline-gold:hover {
-    background-color: var(--accent-gold) !important;
-    color: #1a1a1a !important;
-}
-
 .grid-mesas {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
-    gap: 12px;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    gap: 10px;
 }
 
 .m-btn {
@@ -70,31 +66,70 @@ select#s-it option {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 12px;
-    font-weight: bold;
+    border-radius: 10px;
+    font-size: 0.9rem;
     border: 1px solid var(--accent-gold);
     color: var(--accent-gold);
     background: transparent;
-    transition: all 0.3s ease;
+    transition: transform 0.1s active;
 }
 
 .m-btn.ocupada {
     border-color: #ff4d4d !important;
     color: #ff4d4d !important;
-    background: rgba(255, 77, 77, 0.2) !important;
-    box-shadow: inset 0 0 10px rgba(255, 77, 77, 0.2);
+    background: rgba(255, 77, 77, 0.1) !important;
+}
+
+.modal-content {
+    border-radius: 0;
+    border: none;
+}
+
+#modalTicket .modal-dialog {
+    margin: 0.5rem;
+}
+
+@media (max-width: 576px) {
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .glass-card {
+        padding: 1rem;
+    }
+
+    h2, h3 {
+        font-size: 1.4rem;
+    }
+
+    .grid-mesas {
+        grid-template-columns: repeat(4, 1fr);
+    }
+
+    .m-btn {
+        font-size: 0.8rem;
+        padding: 5px;
+    }
+}
+
+#lista {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    background: rgba(0,0,0,0.2);
 }
 
 .list-group-item {
     background: transparent !important;
-    border: none !important;
-    border-bottom: 1px solid rgba(197, 160, 89, 0.2) !important;
-    color: var(--soft-white) !important;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.1) !important;
+    color: #fff !important;
+    font-size: 0.9rem;
 }
 
 .ticket-row {
     display: flex;
     justify-content: space-between;
+    font-family: 'Courier New', monospace;
 }
-
-.border-gold { border: 1px solid var(--accent-gold) !important; }
