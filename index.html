@@ -41,26 +41,41 @@
         </section>
     </main>
 
-    <div class="modal fade" id="modalTicket" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
-        <div class="modal-dialog modal-sm">
-            <div class="modal-content bg-light text-dark p-4" style="font-family: 'Courier New', Courier, monospace; border: none; border-radius: 0;">
-                <div class="text-center">
-                    <h5 class="fw-bold">EL ORÁCULO DEL SABOR</h5>
-                    <p class="small">SERVICIO DE RESTAURANTE</p>
-                    <hr style="border-top: 2px dashed #000;">
-                </div>
-                <div id="ticket-detalle"></div>
-                <hr style="border-top: 2px dashed #000;">
-                <div class="text-center">
-                    <p class="small">Toma foto a tu ticket</p>
-                    <button type="button" class="btn btn-dark btn-sm w-100" data-bs-dismiss="modal" onclick="window.limpiarTodo()">Finalizar y Limpiar Mesa</button>
+    <div class="modal fade" id="modalCantidad" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content glass-card p-0" style="border: 1px solid #c5a059;">
+                <div class="modal-body text-center p-4">
+                    <h4 id="cant-nombre-item" style="color: #c5a059;"></h4>
+                    <img id="cant-img-item" src="" class="img-fluid rounded my-3 border-gold" style="max-height: 180px; width: 100%; object-fit: cover;">
+                    <p id="cant-desc-item" class="small text-light mb-4"></p>
+                    <div class="d-flex justify-content-center align-items-center gap-4">
+                        <button class="btn btn-outline-gold rounded-circle" onclick="window.modCant(-1)" style="width: 45px; height: 45px;">-</button>
+                        <h2 id="cant-num" class="m-0">1</h2>
+                        <button class="btn btn-outline-gold rounded-circle" onclick="window.modCant(1)" style="width: 45px; height: 45px;">+</button>
+                    </div>
+                    <button class="btn btn-primary w-100 mt-4" onclick="window.confirmarAgregado()">Confirmar Pedido</button>
                 </div>
             </div>
         </div>
     </div>
 
+    <div class="modal fade" id="modalTicket" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content bg-light text-dark p-4" style="font-family: 'Courier New', Courier, monospace;">
+                <div class="text-center">
+                    <h5 class="fw-bold">EL ORÁCULO DEL SABOR</h5>
+                    <p class="small">TICKET DE CONSUMO</p>
+                    <hr style="border-top: 2px dashed #000;">
+                </div>
+                <div id="ticket-detalle"></div>
+                <hr style="border-top: 2px dashed #000;">
+                <button type="button" class="btn btn-dark btn-sm w-100" data-bs-dismiss="modal" onclick="window.limpiarTodo()">Cerrar y Limpiar Mesa</button>
+            </div>
+        </div>
+    </div>
+
     <footer class="footer mt-auto py-3 bg-dark text-center" style="border-top: 1px solid #c5a059;">
-        <div class="container text-muted small">© 2026 El Oráculo del Sabor - Gestión Profesional</div>
+        <div class="container text-muted small">© 2026 El Oráculo del Sabor</div>
     </footer>
 
     <script src="bootstrap.bundle.js"></script>
