@@ -12,16 +12,11 @@ body {
     background-attachment: fixed;
     color: var(--soft-white);
     font-family: 'Segoe UI', Roboto, sans-serif;
-    line-height: 1.6;
 }
 
 .bg-greek-blue {
     background-color: var(--primary-dark) !important;
     border-bottom: 1px solid var(--accent-gold) !important;
-}
-
-.navbar-brand {
-    letter-spacing: 1.5px;
 }
 
 .glass-card {
@@ -30,21 +25,12 @@ body {
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid var(--glass-border);
     border-radius: 1rem;
-    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-    padding: 2.5rem;
 }
 
 .form-control {
     background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: white !important;
-    border-radius: 0.5rem;
-}
-
-.form-control:focus {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: var(--accent-gold);
-    box-shadow: 0 0 8px rgba(197, 160, 89, 0.3);
 }
 
 select#s-it option {
@@ -56,8 +42,7 @@ select#s-it option {
     background-color: var(--accent-gold) !important;
     border: none !important;
     color: #1a1a1a !important;
-    font-weight: 600;
-    text-transform: uppercase;
+    font-weight: bold;
 }
 
 .btn-outline-gold {
@@ -81,12 +66,17 @@ select#s-it option {
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 10px;
+    border-radius: 12px;
     font-weight: bold;
-    transition: 0.2s;
     border: 1px solid var(--accent-gold);
     color: var(--accent-gold);
     background: transparent;
+}
+
+.m-btn.ocupada {
+    border-color: #ff4d4d !important;
+    color: #ff4d4d !important;
+    background: rgba(255, 77, 77, 0.1) !important;
 }
 
 .list-group-item {
@@ -99,10 +89,6 @@ select#s-it option {
 .ticket-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 4px;
 }
 
-@media (max-width: 756px) {
-    .glass-card { padding: 1.5rem; }
-    .grid-mesas { grid-template-columns: repeat(2, 1fr); }
-}
+.border-gold { border: 1px solid var(--accent-gold) !important; }
