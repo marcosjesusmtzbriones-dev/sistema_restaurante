@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, onSnapshot, serverTimestamp, updateDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDPuAu5691El4Xbh-ap59FsRAgdNWRy5c0",
@@ -19,7 +19,6 @@ let carrito = [];
 let mesaActiva = null;
 let tempItem = null;
 let cantidadTemp = 1;
-let tiemposMesas = {};
 
 document.getElementById('btn-login').onclick = async () => {
     const e = document.getElementById('email').value;
@@ -44,7 +43,7 @@ function renderInterfaz(user) {
     document.getElementById('section-auth').classList.add('d-none');
     document.getElementById('section-app').classList.remove('d-none');
     document.getElementById('btn-logout').classList.remove('d-none');
-    document.getElementById('panel-bienvenida').innerHTML = `<h2 style="color:#c5a059;">${user.nombre}</h2><span class="badge bg-outline-gold border-gold mb-4">${user.rol}</span>`;
+    document.getElementById('panel-bienvenida').innerHTML = `<h2 style="color:#c5a059;">${user.nombre}</h2><span class="badge border-gold mb-4">${user.rol}</span>`;
     if (user.rol === 'gerente') { renderGerente(); } else { renderMesero(); }
 }
 
@@ -64,7 +63,7 @@ function renderGerente() {
         </div></div>
         <div class="col-md-6"><div class="glass-card p-4"><h4>Nuevo Mesero</h4>
             <input id="m-em" class="form-control mb-2" placeholder="Email">
-            <input id="m-ps" type="password" class="form-control mb-3" placeholder="Pass">
+            <input id="m-ps" type="password" class="form-control mb-3" placeholder="Contraseña">
             <button onclick="window.regM()" class="btn btn-outline-gold w-100">Registrar</button>
         </div></div>`;
 }
@@ -88,18 +87,15 @@ window.regM = async () => {
 };
 
 async function renderMesero() {
-    const snap = await getDocs(collection(db, "menu"));
+    const menuSnap = await getDocs(collection(db, "menu"));
     let opts = "";
-    snap.forEach(d => { 
+    menuSnap.forEach(d => { 
         const p = d.data();
         opts += `<option value="${p.nombre}" data-precio="${p.precio}" data-desc="${p.descripcion}" data-img="${p.imagen}">${p.nombre} ($${p.precio})</option>`; 
     });
     
-    let btns = "";
-    for(let i=1; i<=10; i++) { btns += `<button id="btn-m-${i}" class="btn m-btn" onclick="window.sM(${i}, this)">M${i}</button>`; }
-
     document.getElementById('render-area').innerHTML = `
-        <div class="col-md-5"><div class="glass-card p-4"><h4>Mesas</h4><div class="grid-mesas">${btns}</div></div></div>
+        <div class="col-md-5"><div class="glass-card p-4"><h4>Mesas</h4><div id="grid-mesas" class="grid-mesas"></div></div></div>
         <div class="col-md-7"><div class="glass-card p-4">
             <h4>Orden: <span id="m-val" style="color:#c5a059;">--</span></h4>
             <select id="s-it" class="form-control mb-3">${opts}</select>
@@ -108,14 +104,36 @@ async function renderMesero() {
             <h5 class="d-flex justify-content-between">Total: <span>$<span id="tot">0</span></span></h5>
             <button onclick="window.cT()" class="btn btn-outline-gold w-100 mt-2">Cerrar Mesa</button>
         </div></div>`;
+
+    // ESCUCHA EN TIEMPO REAL PARA LAS MESAS
+    onSnapshot(collection(db, "mesas_activas"), (snapshot) => {
+        const grid = document.getElementById('grid-mesas');
+        grid.innerHTML = "";
+        const ocupadas = {};
+        snapshot.forEach(doc => { ocupadas[doc.id] = doc.data(); });
+
+        for(let i=1; i<=10; i++) {
+            const isOcupada = ocupadas[i];
+            const btn = document.createElement('button');
+            btn.className = `btn m-btn ${isOcupada ? 'ocupada' : ''}`;
+            btn.innerText = `M${i}`;
+            btn.onclick = () => window.sM(i, isOcupada);
+            grid.appendChild(btn);
+        }
+    });
 }
 
-window.sM = (n, b) => {
-    if(b.classList.contains('ocupada') && mesaActiva !== n) return alert("Mesa Ocupada");
+window.sM = async (n, ocupada) => {
+    if(ocupada && mesaActiva !== n) return alert("Mesa siendo atendida.");
     mesaActiva = n;
     document.getElementById('m-val').innerText = "Mesa " + n;
-    if(!tiemposMesas[n]) tiemposMesas[n] = new Date();
-    b.classList.add('ocupada');
+    
+    if(!ocupada) {
+        await setDoc(doc(db, "mesas_activas", n.toString()), { 
+            inicio: new Date().getTime(),
+            mesero: auth.currentUser.email 
+        });
+    }
 };
 
 window.aI = () => {
@@ -147,19 +165,24 @@ window.confirmarAgregado = () => {
 
 window.cT = async () => {
     if (!mesaActiva || carrito.length === 0) return alert("Faltan datos");
-    const duracion = Math.floor((new Date() - tiemposMesas[mesaActiva]) / 60000);
+    
+    const mesaDoc = await getDoc(doc(db, "mesas_activas", mesaActiva.toString()));
+    const inicio = mesaDoc.data().inicio;
+    const duracion = Math.floor((new Date().getTime() - inicio) / 60000);
+    
     const total = document.getElementById('tot').innerText;
     let det = `<p><b>MESA:</b> ${mesaActiva} | <b>TIEMPO:</b> ${duracion} min</p><hr>`;
     carrito.forEach(i => { det += `<div class="ticket-row"><span>${i.c}x ${i.n}</span><span>$${i.p * i.c}</span></div>`; });
     det += `<hr><div class="ticket-row fw-bold"><span>TOTAL:</span><span>$${total}</span></div>`;
+    
     document.getElementById('ticket-detalle').innerHTML = det;
     new bootstrap.Modal(document.getElementById('modalTicket')).show();
+    
     await addDoc(collection(db, "ventas"), { mesa: mesaActiva, total: parseInt(total), duracion, fecha: serverTimestamp() });
 };
 
-window.limpiarTodo = () => {
-    delete tiemposMesas[mesaActiva];
-    document.getElementById(`btn-m-${mesaActiva}`).classList.remove('ocupada');
+window.limpiarTodo = async () => {
+    await deleteDoc(doc(db, "mesas_activas", mesaActiva.toString()));
     carrito = []; mesaActiva = null;
     document.getElementById('lista').innerHTML = "";
     document.getElementById('tot').innerText = "0";
