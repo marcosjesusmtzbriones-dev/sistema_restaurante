@@ -3,14 +3,16 @@
     --accent-gold: #c5a059;
     --greek-blue: #1b3a5d;
     --soft-white: #f8f9fa;
-    --glass-bg: rgba(10, 25, 47, 0.98);
+    --glass-bg: rgba(10, 25, 47, 0.95); /* Color sólido para evitar lag en móvil */
     --glass-border: rgba(197, 160, 89, 0.3);
 }
 
 body {
     background: #0f172a;
+    background-image: radial-gradient(circle at top right, #1e293b, #0f172a);
+    background-attachment: fixed;
     color: var(--soft-white);
-    font-family: 'Segoe UI', system-ui, sans-serif;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
     overflow-x: hidden;
 }
 
@@ -19,19 +21,28 @@ body {
     border-bottom: 1px solid var(--accent-gold) !important;
 }
 
+/* Tarjetas optimizadas para no trabar el celular */
 .glass-card {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
     padding: 1.5rem;
     margin-bottom: 1rem;
 }
 
+/* Inputs siempre visibles */
 .form-control {
-    background: rgba(255, 255, 255, 0.1) !important;
+    background: rgba(255, 255, 255, 0.08) !important;
     border: 1px solid rgba(255, 255, 255, 0.2) !important;
     color: #ffffff !important;
-    font-size: 16px !important;
+    font-size: 16px !important; /* Evita zoom automático en iPhone */
+}
+
+/* Selector de productos */
+select#s-it option {
+    background-color: #1a1a1a !important;
+    color: #ffffff !important;
 }
 
 .btn-primary {
@@ -39,6 +50,7 @@ body {
     border: none !important;
     color: #1a1a1a !important;
     font-weight: bold;
+    padding: 0.8rem;
 }
 
 .btn-outline-gold {
@@ -46,9 +58,10 @@ body {
     color: var(--accent-gold) !important;
 }
 
+/* Grid de mesas ultra adaptable */
 .grid-mesas {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(65px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
     gap: 10px;
 }
 
@@ -58,10 +71,11 @@ body {
     align-items: center;
     justify-content: center;
     border-radius: 10px;
-    font-size: 0.8rem;
+    font-size: 0.9rem;
     border: 1px solid var(--accent-gold);
     color: var(--accent-gold);
     background: transparent;
+    transition: transform 0.1s active;
 }
 
 .m-btn.ocupada {
@@ -70,18 +84,59 @@ body {
     background: rgba(255, 77, 77, 0.1) !important;
 }
 
-.m-btn.seleccionada {
-    box-shadow: 0 0 15px var(--accent-gold);
-    background: rgba(197, 160, 89, 0.2);
+/* MODAL DEL TICKET - Corregido para que no se trabe */
+.modal-content {
+    border-radius: 0;
+    border: none;
 }
 
+#modalTicket .modal-dialog {
+    margin: 0.5rem; /* Margen pequeño en móviles */
+}
+
+/* Ajuste para pantallas pequeñas (Celulares) */
 @media (max-width: 576px) {
-    .grid-mesas { grid-template-columns: repeat(4, 1fr); }
-    .glass-card { padding: 1rem; }
+    .container {
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    
+    .glass-card {
+        padding: 1rem;
+    }
+
+    h2, h3 {
+        font-size: 1.4rem;
+    }
+
+    .grid-mesas {
+        grid-template-columns: repeat(4, 1fr); /* 4 mesas por fila en móvil */
+    }
+
+    .m-btn {
+        font-size: 0.8rem;
+        padding: 5px;
+    }
+}
+
+/* Lista de pedidos */
+#lista {
+    max-height: 250px;
+    overflow-y: auto;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    background: rgba(0,0,0,0.2);
 }
 
 .list-group-item {
     background: transparent !important;
     border-bottom: 1px solid rgba(197, 160, 89, 0.1) !important;
     color: #fff !important;
+    font-size: 0.9rem;
+}
+
+.ticket-row {
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Courier New', monospace;
 }
