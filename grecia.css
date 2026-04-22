@@ -20,6 +20,10 @@ body {
     border-bottom: 1px solid var(--accent-gold) !important;
 }
 
+.navbar-brand {
+    letter-spacing: 1.5px;
+}
+
 .glass-card {
     background: var(--glass-bg);
     backdrop-filter: blur(12px);
@@ -41,6 +45,11 @@ body {
     background: rgba(255, 255, 255, 0.08);
     border-color: var(--accent-gold);
     box-shadow: 0 0 8px rgba(197, 160, 89, 0.3);
+}
+
+select#s-it option {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
 }
 
 .btn-primary {
