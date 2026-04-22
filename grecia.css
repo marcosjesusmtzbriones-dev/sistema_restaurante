@@ -28,9 +28,13 @@ body {
 }
 
 .form-control {
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white !important;
+    background: rgba(255, 255, 255, 0.1) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    color: #ffffff !important; /* Texto siempre blanco */
+}
+
+.form-control::placeholder {
+    color: rgba(255, 255, 255, 0.5) !important;
 }
 
 select#s-it option {
@@ -71,12 +75,14 @@ select#s-it option {
     border: 1px solid var(--accent-gold);
     color: var(--accent-gold);
     background: transparent;
+    transition: all 0.3s ease;
 }
 
 .m-btn.ocupada {
     border-color: #ff4d4d !important;
     color: #ff4d4d !important;
-    background: rgba(255, 77, 77, 0.1) !important;
+    background: rgba(255, 77, 77, 0.2) !important;
+    box-shadow: inset 0 0 10px rgba(255, 77, 77, 0.2);
 }
 
 .list-group-item {
