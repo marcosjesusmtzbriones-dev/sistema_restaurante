@@ -1,64 +1,99 @@
 :root {
-    --greek-blue: #003366;
-    --accent-cyan: #00d4ff;
-    --dark-bg: #050a14;
+    --primary-dark: #0a192f;
+    --accent-gold: #c5a059;
+    --greek-blue: #1b3a5d;
+    --soft-white: #f8f9fa;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
 }
 
 body {
-    background: radial-gradient(circle at top, #102a43, var(--dark-bg));
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
     background-attachment: fixed;
-    color: #f0f4f8;
-    font-family: sans-serif;
-}
-
-.glass-card {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 1.25rem;
-    padding: 2rem;
+    color: var(--soft-white);
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
 }
 
 .bg-greek-blue {
-    background-color: var(--greek-blue) !important;
-    border-bottom: 2px solid var(--accent-cyan);
+    background-color: var(--primary-dark) !important;
+    border-bottom: 1px solid var(--accent-gold) !important;
+}
+
+.glass-card {
+    background: var(--glass-bg);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--glass-border);
+    border-radius: 1rem;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+    padding: 2.5rem;
 }
 
 .form-control {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.05);
     border: 1px solid rgba(255, 255, 255, 0.2);
     color: white !important;
+    border-radius: 0.5rem;
 }
 
 .form-control:focus {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    border-color: var(--accent-cyan);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: var(--accent-gold);
+    box-shadow: 0 0 8px rgba(197, 160, 89, 0.3);
+}
+
+.btn-primary {
+    background-color: var(--accent-gold) !important;
+    border: none !important;
+    color: #1a1a1a !important;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.btn-outline-gold {
+    border-color: var(--accent-gold) !important;
+    color: var(--accent-gold) !important;
+}
+
+.btn-outline-gold:hover {
+    background-color: var(--accent-gold) !important;
+    color: #1a1a1a !important;
+}
+
+.grid-mesas {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(85px, 1fr));
+    gap: 12px;
+}
+
+.m-btn {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    font-weight: bold;
+    transition: 0.2s;
+    border: 1px solid var(--accent-gold);
+    color: var(--accent-gold);
+    background: transparent;
 }
 
 .list-group-item {
-    background: rgba(255, 255, 255, 0.1) !important;
-    color: white !important;
-    border: 1px solid var(--accent-cyan) !important;
-    margin-bottom: 5px;
+    background: transparent !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(197, 160, 89, 0.2) !important;
+    color: var(--soft-white) !important;
 }
 
 .ticket-row {
     display: flex;
     justify-content: space-between;
-    font-size: 0.9rem;
+    margin-bottom: 4px;
 }
 
-.grid-mesas {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
-}
-
-@media (min-width: 768px) {
+@media (max-width: 756px) {
+    .glass-card { padding: 1.5rem; }
     .grid-mesas { grid-template-columns: repeat(2, 1fr); }
-}
-
-@media (max-width: 768px) {
-    .glass-card { padding: 1rem; }
 }
