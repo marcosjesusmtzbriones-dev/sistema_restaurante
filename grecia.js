@@ -49,14 +49,25 @@ function renderInterfaz(user) {
 
 function renderGerente() {
     document.getElementById('render-area').innerHTML = `
-        <div class="col-md-6"><div class="glass-card"><h4>Nuevo Platillo</h4>
-            <input id="p-nom" class="form-control mb-2" placeholder="Nombre">
-            <input id="p-pre" type="number" class="form-control mb-2" placeholder="Precio">
-            <input id="p-des" class="form-control mb-2" placeholder="Descripción">
-            <input id="p-img" class="form-control mb-2" placeholder="URL Imagen">
-            <select id="p-tie" class="form-control mb-3"><option value="Entrada">Entrada</option><option value="Fuerte">Fuerte</option><option value="Postre">Postre</option></select>
-            <button onclick="window.addP()" class="btn btn-primary w-100">Guardar</button>
-        </div></div>`;
+        <div class="col-md-6">
+            <div class="glass-card">
+                <h4>Nuevo Platillo</h4>
+                <input id="p-nom" class="form-control mb-2" placeholder="Nombre">
+                <input id="p-pre" type="number" class="form-control mb-2" placeholder="Precio">
+                <input id="p-des" class="form-control mb-2" placeholder="Descripción">
+                <input id="p-img" class="form-control mb-2" placeholder="URL Imagen">
+                <select id="p-tie" class="form-control mb-3"><option value="Entrada">Entrada</option><option value="Fuerte">Fuerte</option><option value="Postre">Postre</option></select>
+                <button onclick="window.addP()" class="btn btn-primary w-100">Guardar Platillo</button>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="glass-card">
+                <h4>Nuevo Mesero</h4>
+                <input id="m-em" class="form-control mb-2" placeholder="Email">
+                <input id="m-ps" type="password" class="form-control mb-3" placeholder="Contraseña">
+                <button onclick="window.regM()" class="btn btn-outline-gold w-100">Registrar Mesero</button>
+            </div>
+        </div>`;
 }
 
 window.addP = async () => {
@@ -68,6 +79,17 @@ window.addP = async () => {
     if(!nombre || !precio) return alert("Llena los campos");
     await addDoc(collection(db, "menu"), { nombre, precio, tiempo, descripcion, imagen });
     alert("Platillo Agregado");
+};
+
+window.regM = async () => {
+    const email = document.getElementById('m-em').value;
+    const pass = document.getElementById('m-ps').value;
+    if(!email || !pass) return alert("Completa los datos");
+    try {
+        const res = await createUserWithEmailAndPassword(auth, email, pass);
+        await setDoc(doc(db, "usuarios", res.user.uid), { nombre: "Mesero", correo: email, rol: "mesero" });
+        alert("Mesero registrado con éxito");
+    } catch (e) { alert("Error al registrar: " + e.message); }
 };
 
 async function renderMesero() {
@@ -108,10 +130,8 @@ async function renderMesero() {
 
 window.sM = async (n, ocupada) => {
     if(ocupada && ocupada.mesero !== auth.currentUser.email) return alert("Mesa atendida por: " + ocupada.mesero);
-    
     mesaActiva = n;
     document.getElementById('m-val').innerText = n;
-    
     if(!ocupada) {
         await setDoc(doc(db, "mesas_activas", n.toString()), { 
             inicio: new Date().getTime(),
@@ -130,7 +150,7 @@ window.aI = () => {
     tempItem = { n: opt.value, p: parseInt(opt.dataset.precio), d: opt.dataset.desc, i: opt.dataset.img };
     document.getElementById('cant-nombre-item').innerText = tempItem.n;
     document.getElementById('cant-desc-item').innerText = tempItem.d || "Delicioso platillo griego";
-    document.getElementById('cant-img-item').src = tempItem.i || 'https://images.unsplash.com/photo-1533777857889-4be7c70b33f7?q=80&w=400';
+    document.getElementById('cant-img-item').src = tempItem.i || 'https://via.placeholder.com/150';
     document.getElementById('cant-num').innerText = "1";
     cantidadTemp = 1;
     new bootstrap.Modal(document.getElementById('modalCantidad')).show();
