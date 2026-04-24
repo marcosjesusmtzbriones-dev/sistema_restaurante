@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
+import { getFirestore, doc, getDoc, setDoc, collection, onSnapshot, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDPuAu5691El4Xbh-ap59FsRAgdNWRy5c0",
@@ -16,158 +16,7 @@ const auth = getAuth(app);
 const db = getFirestore(app);
 
 let mesaActiva = null;
-
-window.renderLanding = async () => {
-    let html = `
-        <section class="hero-section text-center text-white d-flex align-items-center justify-content-center">
-            <div>
-                <h1 class="display-3 fw-bold">El Oráculo <span style="color:#c5a059">del Sabor</span></h1>
-                <p class="lead">Tradición Griega en Ecatepec</p>
-                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-                    <button class="btn btn-primary btn-lg px-5" onclick="window.showAuth()">RESERVAR MESA</button>
-                    <button class="btn btn-outline-gold btn-lg px-5" onclick="window.verificarPersonal()">SOY PERSONAL</button>
-                </div>
-            </div>
-        </section>
-        <section class="container my-5"><h2 class="text-center mb-4" style="color:#c5a059">Menú</h2><div id="menu-previo" class="row g-4"></div></section>
-        <section class="container my-5 text-center">
-            <h2 class="mb-4" style="color:#c5a059">Ubicación</h2>
-            <div class="glass-card p-0 overflow-hidden mb-3">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d585.34!2d-99.026!3d19.538" width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
-            </div>
-        </section>`;
-    document.getElementById('main-content').innerHTML = html;
-    window.cargarMenuPrevio();
-};
-
-window.cargarMenuPrevio = async () => {
-    const snap = await getDocs(collection(db, "menu"));
-    const container = document.getElementById('menu-previo');
-    if(!container) return;
-    snap.forEach(doc => {
-        const p = doc.data();
-        container.innerHTML += `<div class="col-md-4"><div class="glass-card text-center h-100"><img src="${p.imagen}" class="img-fluid rounded mb-3" style="height:180px; width:100%; object-fit:cover;"><h4>${p.nombre}</h4><h5 style="color:#c5a059">$${p.precio}</h5></div></div>`;
-    });
-};
-
-window.renderMenuPublico = async () => {
-    document.getElementById('main-content').innerHTML = `<div class="container my-5"><h2 class="text-center mb-4" style="color:#c5a059">Nuestra Carta</h2><div id="menu-full" class="row g-4"></div></div>`;
-    const snap = await getDocs(collection(db, "menu"));
-    const container = document.getElementById('menu-full');
-    snap.forEach(doc => {
-        const p = doc.data();
-        container.innerHTML += `<div class="col-md-4"><div class="glass-card text-center"><img src="${p.imagen}" class="img-fluid rounded mb-3" style="height:200px; width:100%; object-fit:cover;"><h4>${p.nombre}</h4><h5 style="color:#c5a059">$${p.precio}</h5></div></div>`;
-    });
-};
-
-window.renderUbicacion = () => {
-    document.getElementById('main-content').innerHTML = `<div class="container my-5 text-center"><h2 class="mb-4" style="color:#c5a059">Ubicación</h2><div class="glass-card p-0 overflow-hidden mb-3"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d585.34!2d-99.026!3d19.538" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe></div></div>`;
-};
-
-window.verificarPersonal = () => {
-    const pass = prompt("Contraseña de Personal:");
-    if (pass === "Oraculo Del Sabor") window.showAuth(true);
-    else alert("Acceso denegado");
-};
-
-window.showAuth = (esPersonal = false) => {
-    document.getElementById('main-content').innerHTML = `
-        <div class="container my-5"><div class="row justify-content-center"><div class="col-md-5">
-            <div class="glass-card" id="auth-box">
-                <h3 class="text-center mb-4" style="color:#c5a059">${esPersonal ? 'Acceso Personal' : 'Acceso Clientes'}</h3>
-                <input id="auth-e" class="form-control mb-2" placeholder="Correo">
-                <input id="auth-p" type="password" class="form-control mb-3" placeholder="Contraseña">
-                <button onclick="window.handleLogin()" class="btn btn-primary w-100 mb-2">Entrar</button>
-                ${!esPersonal ? '<button onclick="window.showRegister()" class="btn btn-outline-gold w-100 btn-sm">Crear Cuenta</button>' : ''}
-            </div>
-        </div></div></div>`;
-};
-
-window.handleLogin = async () => {
-    const e = document.getElementById('auth-e').value;
-    const p = document.getElementById('auth-p').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Error de acceso"); }
-};
-
-window.showRegister = () => {
-    document.getElementById('auth-box').innerHTML = `
-        <h3 class="text-center mb-4" style="color:#c5a059">Registro</h3>
-        <input id="reg-n" class="form-control mb-2" placeholder="Nombre">
-        <input id="reg-e" class="form-control mb-2" placeholder="Correo">
-        <input id="reg-p" type="password" class="form-control mb-3" placeholder="Contraseña">
-        <button onclick="window.handleRegister()" class="btn btn-primary w-100">Registrarme</button>`;
-};
-
-window.handleRegister = async () => {
-    const n = document.getElementById('reg-n').value;
-    const e = document.getElementById('reg-e').value;
-    const p = document.getElementById('reg-p').value;
-    try {
-        const res = await createUserWithEmailAndPassword(auth, e, p);
-        await setDoc(doc(db, "usuarios", res.user.uid), { nombre: n, correo: e, rol: "cliente" });
-    } catch (err) { alert(err.message); }
-};
-
-window.renderGerente = () => {
-    document.getElementById('main-content').innerHTML = `
-        <div class="container my-5"><div class="row g-4">
-            <div class="col-md-6"><div class="glass-card"><h4>Nuevo Mesero</h4><input id="m-nom" class="form-control mb-2" placeholder="Nombre"><input id="m-ema" class="form-control mb-2" placeholder="Correo"><input id="m-pas" type="password" class="form-control mb-3" placeholder="Contraseña"><button onclick="window.registrarMesero()" class="btn btn-primary w-100">REGISTRAR</button></div></div>
-            <div class="col-md-6"><div class="glass-card"><h4>Nuevo Platillo</h4><input id="p-nom" class="form-control mb-2" placeholder="Nombre"><input id="p-pre" type="number" class="form-control mb-2" placeholder="Precio"><input id="p-img" class="form-control mb-3" placeholder="URL Imagen"><button onclick="window.agregarPlatillo()" class="btn btn-primary w-100">GUARDAR</button></div></div>
-        </div></div>`;
-};
-
-window.registrarMesero = async () => {
-    const n = document.getElementById('m-nom').value;
-    const e = document.getElementById('m-ema').value;
-    const p = document.getElementById('m-pas').value;
-    try {
-        const tApp = initializeApp(firebaseConfig, "temp");
-        const res = await createUserWithEmailAndPassword(getAuth(tApp), e, p);
-        await setDoc(doc(db, "usuarios", res.user.uid), { nombre: n, correo: e, rol: "mesero" });
-        alert("Mesero creado");
-        location.reload();
-    } catch (err) { alert(err.message); }
-};
-
-window.agregarPlatillo = async () => {
-    const n = document.getElementById('p-nom').value;
-    const p = document.getElementById('p-pre').value;
-    const i = document.getElementById('p-img').value;
-    await addDoc(collection(db, "menu"), { nombre: n, precio: p, imagen: i });
-    alert("Platillo agregado");
-};
-
-window.renderReservaCliente = () => {
-    document.getElementById('main-content').innerHTML = `
-        <div class="container my-5"><div class="glass-card text-center">
-            <h2 class="mb-4" style="color:#c5a059">Reserva tu Mesa</h2>
-            <div class="row">
-                <div class="col-md-5"><input id="res-f" type="date" class="form-control mb-3" min="${new Date().toISOString().split('T')[0]}"><select id="res-h" class="form-control mb-4"><option>14:00</option><option>17:00</option><option>20:00</option></select></div>
-                <div class="col-md-7"><div id="grid-reserva" class="grid-mesas"></div><button id="btn-confirmar-res" class="btn btn-primary w-100 mt-4 d-none" onclick="window.saveReserva()">CONFIRMAR RESERVA</button></div>
-            </div>
-        </div></div>`;
-    onSnapshot(collection(db, "mesas_activas"), (snap) => {
-        const grid = document.getElementById('grid-reserva');
-        if(!grid) return; grid.innerHTML = "";
-        const ocupadas = {}; snap.forEach(d => ocupadas[d.id] = true);
-        for(let i=1; i<=12; i++){
-            const btn = document.createElement('button');
-            btn.className = `btn m-btn ${ocupadas[i] ? 'ocupada' : ''} ${mesaActiva == i ? 'seleccionada' : ''}`;
-            btn.innerText = `M${i}`; btn.disabled = ocupadas[i];
-            btn.onclick = () => { mesaActiva = i; document.querySelectorAll('.m-btn').forEach(b => b.classList.remove('seleccionada')); btn.classList.add('seleccionada'); document.getElementById('btn-confirmar-res').classList.remove('d-none'); };
-            grid.appendChild(btn);
-        }
-    });
-};
-
-window.saveReserva = async () => {
-    const f = document.getElementById('res-f').value;
-    const h = document.getElementById('res-h').value;
-    const u = auth.currentUser.email;
-    await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), { cliente: u, fecha: f, hora: h, estado: "reservada" });
-    document.getElementById('ticket-detalle').innerHTML = `<p><b>Cliente:</b> ${u}</p><p><b>Mesa:</b> ${mesaActiva}</p><p><b>Fecha:</b> ${f}</p><p><b>Hora:</b> ${h}</p>`;
-    new bootstrap.Modal('#modalTicket').show();
-};
+let pedidoLocal = [];
 
 window.renderMesero = () => {
     document.getElementById('main-content').innerHTML = `
@@ -176,37 +25,57 @@ window.renderMesero = () => {
             <div class="row">
                 <div class="col-md-4">
                     <div class="glass-card">
-                        <h4>Mapa de Mesas</h4>
+                        <h4>Mesas</h4>
                         <div id="grid-mesas-m" class="grid-mesas"></div>
-                        <div class="mt-3 small d-flex justify-content-between">
-                            <span><i class="badge bg-secondary"> </i> Libre</span>
-                            <span><i class="badge bg-danger"> </i> Reserva</span>
-                            <span><i class="badge bg-info"> </i> Atendiendo</span>
-                        </div>
                     </div>
                 </div>
                 <div id="area-atencion" class="col-md-8 d-none">
-                    <div class="glass-card text-center">
-                        <h3>Mesa <span id="m-atend" style="color:#c5a059"></span></h3>
-                        <p id="info-cliente" class="lead"></p>
-                        <hr style="border-color: rgba(197,160,89,0.3)">
-                        <div class="d-grid gap-2">
-                            <button class="btn btn-primary" onclick="window.compartirTicket()">CERRAR Y ENVIAR TICKET</button>
-                            <button class="btn btn-outline-danger btn-sm" onclick="window.limpiarMesa()">LIMPIAR / LIBERAR MESA</button>
+                    <div class="glass-card">
+                        <h3 class="text-center">Mesa: <span id="m-atend" style="color:#c5a059">--</span></h3>
+                        <div class="mb-3">
+                            <label class="form-label">Agregar Platillo:</label>
+                            <select id="select-platillo" class="form-control" onchange="window.prepararPedido(this.value)">
+                                <option value="">Selecciona un producto...</option>
+                            </select>
                         </div>
+                        <div id="lista-pedido" class="mb-3"></div>
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h4>Total:</h4>
+                            <h4 style="color:#c5a059">$<span id="total-atencion">0</span></h4>
+                        </div>
+                        <button class="btn btn-primary w-100" onclick="window.generarTicket()">Ticket y Cerrar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal fade" id="modalCantidad" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-dark text-white border-gold">
+                    <div class="modal-header border-0"><h5 id="p-nombre-modal"></h5></div>
+                    <div class="modal-body text-center">
+                        <div class="d-flex justify-content-center align-items-center gap-3">
+                            <button class="btn btn-outline-gold" onclick="window.modCant(-1)">-</button>
+                            <h2 id="p-cant-modal">1</h2>
+                            <button class="btn btn-outline-gold" onclick="window.modCant(1)">+</button>
+                        </div>
+                        <button class="btn btn-primary w-100 mt-4" onclick="window.confirmarProducto()">Confirmar Pedido</button>
                     </div>
                 </div>
             </div>
         </div>`;
+
+    actualizarSelectProductos();
+
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
         const grid = document.getElementById('grid-mesas-m');
         if(!grid) return; grid.innerHTML = "";
         const ocupadas = {}; snap.forEach(d => ocupadas[d.id] = d.data());
+        
         for(let i=1; i<=12; i++){
             const btn = document.createElement('button');
             const dM = ocupadas[i];
-            let cE = "";
-            if (dM) cE = dM.mesero_asignado ? "atendida" : "ocupada";
+            let cE = dM ? (dM.mesero_asignado ? "atendida" : "ocupada") : "";
             btn.className = `btn m-btn ${cE}`;
             btn.innerText = `M${i}`;
             btn.onclick = () => window.atenderMesa(i, dM);
@@ -218,58 +87,104 @@ window.renderMesero = () => {
 window.atenderMesa = async (id, data) => {
     const miEmail = auth.currentUser.email;
     mesaActiva = id;
-    if(!data) {
-        if(!confirm(`¿Asignar Mesa ${id} a cliente presencial?`)) return;
-        data = { cliente: "Presencial", mesero_asignado: miEmail, estado: "atendiendo", fecha: new Date().toISOString().split('T')[0] };
-        await setDoc(doc(db, "mesas_activas", id.toString()), data);
-    } else if (data.mesero_asignado && data.mesero_asignado !== miEmail) {
-        alert(`Mesa atendida por: ${data.mesero_asignado}`);
+
+    if (data && data.mesero_asignado && data.mesero_asignado !== miEmail) {
+        alert(`Lo siento, la Mesa ${id} ya la está atendiendo: ${data.mesero_asignado}`);
         return;
-    } else if(!data.mesero_asignado) {
-        if(!confirm(`¿Atender reserva de ${data.cliente}?`)) return;
-        await updateDoc(doc(db, "mesas_activas", id.toString()), { mesero_asignado: miEmail, estado: "atendiendo" });
-        data.mesero_asignado = miEmail;
     }
+
+    if(!data) {
+        if(!confirm(`¿Abrir Mesa ${id} para cliente presencial?`)) return;
+        data = { cliente: "Presencial", mesero_asignado: miEmail, productos: [], total: 0 };
+        await setDoc(doc(db, "mesas_activas", id.toString()), data);
+    } else if(!data.mesero_asignado) {
+        await updateDoc(doc(db, "mesas_activas", id.toString()), { mesero_asignado: miEmail });
+    }
+
+    pedidoLocal = data.productos || [];
     document.getElementById('area-atencion').classList.remove('d-none');
     document.getElementById('m-atend').innerText = id;
-    document.getElementById('info-cliente').innerHTML = `<strong>Cliente:</strong> ${data.cliente}<br><small>Mesero: ${data.mesero_asignado}</small>`;
+    window.renderListaPedido();
 };
 
-window.limpiarMesa = async () => {
-    if(!mesaActiva) return;
-    if(confirm(`¿Liberar Mesa ${mesaActiva}?`)) {
-        await deleteDoc(doc(db, "mesas_activas", mesaActiva.toString()));
-        document.getElementById('area-atencion').classList.add('d-none');
-        mesaActiva = null;
-    }
+let prodTemp = null;
+let cantTemp = 1;
+
+async function actualizarSelectProductos() {
+    const snap = await getDocs(collection(db, "menu"));
+    const sel = document.getElementById('select-platillo');
+    snap.forEach(d => {
+        const p = d.data();
+        const opt = document.createElement('option');
+        opt.value = JSON.stringify({nombre: p.nombre, precio: p.precio});
+        opt.innerText = `${p.nombre} - $${p.precio}`;
+        sel.appendChild(opt);
+    });
+}
+
+window.prepararPedido = (val) => {
+    if(!val) return;
+    prodTemp = JSON.parse(val);
+    cantTemp = 1;
+    document.getElementById('p-nombre-modal').innerText = prodTemp.nombre;
+    document.getElementById('p-cant-modal').innerText = cantTemp;
+    new bootstrap.Modal('#modalCantidad').show();
 };
 
-window.compartirTicket = () => {
-    const t = document.getElementById('ticket-captura');
-    html2canvas(t).then(canvas => {
-        canvas.toBlob(async (blob) => {
-            const f = new File([blob], 'Ticket.png', { type: 'image/png' });
-            if (navigator.share) await navigator.share({ files: [f], title: 'El Oráculo' });
-            else { const l = document.createElement('a'); l.download = 'Ticket.png'; l.href = URL.createObjectURL(blob); l.click(); }
-        });
+window.modCant = (v) => {
+    cantTemp = Math.max(1, cantTemp + v);
+    document.getElementById('p-cant-modal').innerText = cantTemp;
+};
+
+window.confirmarProducto = async () => {
+    const subtotal = prodTemp.precio * cantTemp;
+    pedidoLocal.push({ nombre: prodTemp.nombre, cantidad: cantTemp, subtotal: subtotal });
+    
+    const total = pedidoLocal.reduce((acc, p) => acc + p.subtotal, 0);
+    await updateDoc(doc(db, "mesas_activas", mesaActiva.toString()), { 
+        productos: pedidoLocal,
+        total: total
+    });
+    
+    bootstrap.Modal.getInstance('#modalCantidad').hide();
+    window.renderListaPedido();
+};
+
+window.renderListaPedido = () => {
+    const container = document.getElementById('lista-pedido');
+    let total = 0;
+    container.innerHTML = "";
+    pedidoLocal.forEach(p => {
+        total += p.subtotal;
+        container.innerHTML += `<div class="d-flex justify-content-between border-bottom py-2"><span>${p.cantidad}x ${p.nombre}</span><span>$${p.subtotal}</span></div>`;
+    });
+    document.getElementById('total-atencion').innerText = total;
+};
+
+window.generarTicket = () => {
+    const ticketHtml = `
+        <div id="ticket-final" class="p-4 bg-white text-dark text-center" style="font-family: monospace; width: 300px; margin: auto;">
+            <h3>EL ORÁCULO DEL SABOR</h3>
+            <p>TICKET DE CONSUMO</p>
+            <hr>
+            <p>MESA: ${mesaActiva} | TIEMPO: 0 min</p>
+            <hr>
+            <div id="items-ticket"></div>
+            <hr>
+            <h4>TOTAL: $${document.getElementById('total-atencion').innerText}</h4>
+            <button class="btn btn-dark w-100 mt-3" onclick="window.cerrarYLimpiar()">Cerrar y Limpiar Mesa</button>
+        </div>`;
+    
+    document.getElementById('main-content').innerHTML = ticketHtml;
+    const items = document.getElementById('items-ticket');
+    pedidoLocal.forEach(p => {
+        items.innerHTML += `<div class="d-flex justify-content-between"><span>${p.cantidad}x ${p.nombre}</span><span>$${p.subtotal}</span></div>`;
     });
 };
 
-onAuthStateChanged(auth, async (u) => {
-    if(u) {
-        const d = await getDoc(doc(db, "usuarios", u.uid));
-        const user = d.data();
-        document.getElementById('btn-logout').classList.remove('d-none');
-        document.getElementById('nav-public').classList.add('d-none');
-        if(user.rol === 'gerente') renderGerente();
-        else if(user.rol === 'mesero') renderMesero();
-        else renderReservaCliente();
-    } else {
-        document.getElementById('btn-logout').classList.add('d-none');
-        document.getElementById('nav-public').classList.remove('d-none');
-        window.renderLanding();
-    }
-});
-
-document.getElementById('btn-logout').onclick = () => signOut(auth);
-window.renderLanding();
+window.cerrarYLimpiar = async () => {
+    await deleteDoc(doc(db, "mesas_activas", mesaActiva.toString()));
+    mesaActiva = null;
+    pedidoLocal = [];
+    window.renderMesero();
+};
