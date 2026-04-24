@@ -45,10 +45,12 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
+
         <section id="menu-section" class="container my-5">
             <h2 class="text-center mb-4" style="color:#c5a059">Nuestro Menú</h2>
             <div id="menu-previo" class="row g-4"></div>
         </section>
+
         <section id="promos-section" class="py-5 bg-greek-dark">
             <div class="container text-center">
                 <h2 class="mb-5" style="color:#c5a059">Promociones del Olimpo</h2>
@@ -80,12 +82,19 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
+
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4" style="color:#c5a059">Ubicación</h2>
             <p class="text-white-50 mb-4">Multiplaza Aragón: Av. Central 120, Ecatepec de Morelos, Méx.</p>
             <div class="glass-card p-0 overflow-hidden mb-3" style="height: 450px;">
-                <iframe width="100%" height="100%" style="border:0" loading="lazy" allowfullscreen 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m12!1m3!1d3760.3201460599147!2d-99.03309602517861!3d19.527903881771122!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb196e864d39%3A0x6649f87c1c045437!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713915123456!5m2!1ses-419!2smx">
+                <iframe 
+                    width="100%" 
+                    height="100%" 
+                    style="border:0" 
+                    loading="lazy" 
+                    allowfullscreen 
+                    referrerpolicy="no-referrer-when-downgrade"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.320473663046!2d-99.03264422533814!3d19.52784573752399!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb17772652b7%3A0x6b45053229b9f76a!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713915000000!5m2!1ses-419!2smx">
                 </iframe>
             </div>
         </section>`;
@@ -321,7 +330,7 @@ window.confirmarProducto = async () => {
 window.renderListaPedido = () => {
     const container = document.getElementById('lista-pedido');
     let total = 0; container.innerHTML = "";
-    pedidoLocal.forEach(p => { total += p.subtotal; container.innerHTML += `<div class="d-flex justify-content-between border-bottom py-2"><span>${p.cantidad}x ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
+    pedidoLocal.forEach(p => { total += p.subtotal; container.innerHTML += `<div class="d-flex justify-content-between border-bottom py-2"><span>${p.cantidad} ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
     document.getElementById('total-atencion').innerText = total;
 };
 
@@ -336,7 +345,7 @@ window.generarTicket = () => {
             <button class="btn btn-dark w-100 mt-3" onclick="window.cerrarYLimpiar()">Cerrar y Limpiar Mesa</button>
         </div>`;
     const items = document.getElementById('items-ticket');
-    pedidoLocal.forEach(p => { items.innerHTML += `<div class="d-flex justify-content-between"><span>${p.cantidad}x ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
+    pedidoLocal.forEach(p => { items.innerHTML += `<div class="d-flex justify-content-between"><span>${p.cantidad} ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
 };
 
 window.cerrarYLimpiar = async () => {
