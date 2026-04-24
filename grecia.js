@@ -56,26 +56,26 @@ window.renderLanding = async () => {
                 <h2 class="mb-5" style="color:#c5a059">Promociones del Olimpo</h2>
                 <div class="row g-4">
                     <div class="col-md-4">
-                        <div class="glass-card h-100 border-gold">
-                            <h3 class="h1 mb-3">2x1</h3>
+                        <div class="glass-card h-100 border-gold p-4">
+                            <h3 class="display-4" style="color:#c5a059">2x1</h3>
                             <h4>Gyros Clásicos</h4>
-                            <p class="text-muted">Todos los martes y jueves</p>
+                            <p class="text-white-50">Todos los martes y jueves</p>
                             <span class="badge bg-primary">¡Imperdible!</span>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="glass-card h-100 border-gold">
-                            <h3 class="h1 mb-3">15%</h3>
+                        <div class="glass-card h-100 border-gold p-4">
+                            <h3 class="display-4" style="color:#c5a059">15%</h3>
                             <h4>Descuento Estudiantes</h4>
-                            <p class="text-muted">Presentando credencial vigente</p>
+                            <p class="text-white-50">Presentando credencial vigente</p>
                             <span class="badge bg-primary">Local Love</span>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="glass-card h-100 border-gold">
-                            <h3 class="h1 mb-3">FREE</h3>
+                        <div class="glass-card h-100 border-gold p-4">
+                            <h3 class="display-4" style="color:#c5a059">FREE</h3>
                             <h4>Postre Baklava</h4>
-                            <p class="text-muted">En tu primera reserva online</p>
+                            <p class="text-white-50">En tu primera reserva online</p>
                             <span class="badge bg-primary">Bienvenida</span>
                         </div>
                     </div>
@@ -85,10 +85,10 @@ window.renderLanding = async () => {
 
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4" style="color:#c5a059">Ubicación</h2>
-            <p class="text-white-50 mb-4">Multiplaza Aragón: Av. Carlos Hank González 120, Ecatepec de Morelos, Méx.</p>
-            <div class="glass-card p-0 overflow-hidden mb-3">
-                <iframe width="100%" height="450" style="border:0" loading="lazy" allowfullscreen 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.334415840939!2d-99.0306121252119!3d19.527357437145703!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb9631778941%3A0x28994992bad2d28d!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713915000000!5m2!1ses-419!2smx">
+            <p class="text-white-50 mb-4">Multiplaza Aragón: Av. Central 120, Ecatepec de Morelos, Méx.</p>
+            <div class="glass-card p-0 overflow-hidden mb-3" style="height: 450px;">
+                <iframe width="100%" height="100%" style="border:0" loading="lazy" allowfullscreen 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.323565979507!2d-99.0305886241289!3d19.527715737155694!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb118f94e9f7%3A0xc3f58a5e1975e507!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713910000000!5m2!1ses-419!2smx">
                 </iframe>
             </div>
         </section>`;
@@ -122,7 +122,7 @@ window.verificarPersonal = () => {
 
 window.showAuth = (esPersonal = false) => {
     document.getElementById('main-content').innerHTML = `
-        <div class="container my-5"><div class="row justify-content-center"><div class="col-md-5">
+        <div class="container my-5 pt-5"><div class="row justify-content-center"><div class="col-md-5">
             <div class="glass-card" id="auth-box">
                 <h3 class="text-center mb-4" style="color:#c5a059">${esPersonal ? 'Acceso Personal' : 'Acceso Clientes'}</h3>
                 <input id="auth-e" class="form-control mb-2" placeholder="Correo">
@@ -302,6 +302,8 @@ window.atenderMesa = async (id, data) => {
     window.renderListaPedido();
 };
 
+window.modCant = (v) => { cantTemp = Math.max(1, cantTemp + v); document.getElementById('p-cant-modal').innerText = cantTemp; };
+
 window.prepararPedido = (val) => {
     if(!val) return;
     prodTemp = JSON.parse(val); cantTemp = 1;
@@ -309,8 +311,6 @@ window.prepararPedido = (val) => {
     document.getElementById('p-cant-modal').innerText = cantTemp;
     new bootstrap.Modal('#modalCantidad').show();
 };
-
-window.modCant = (v) => { cantTemp = Math.max(1, cantTemp + v); document.getElementById('p-cant-modal').innerText = cantTemp; };
 
 window.confirmarProducto = async () => {
     pedidoLocal.push({ nombre: prodTemp.nombre, cantidad: cantTemp, subtotal: prodTemp.precio * cantTemp });
