@@ -63,8 +63,8 @@ function renderGerente() {
         <div class="col-md-6">
             <div class="glass-card">
                 <h4>Nuevo Mesero</h4>
-                <input id="m-em" class="form-control mb-2" placeholder="Email">
-                <input id="m-ps" type="password" class="form-control mb-3" placeholder="Contraseña">
+                <input id="m-em" class="form-control mb-2" placeholder="Email" autocomplete="off">
+                <input id="m-ps" type="password" class="form-control mb-3" placeholder="Contraseña deseada" autocomplete="new-password">
                 <button onclick="window.regM()" class="btn btn-outline-gold w-100">Registrar Mesero</button>
             </div>
         </div>`;
@@ -89,12 +89,12 @@ window.regM = async () => {
         const res = await createUserWithEmailAndPassword(auth, email, pass);
         await setDoc(doc(db, "usuarios", res.user.uid), { nombre: "Mesero", correo: email, rol: "mesero" });
         alert("Mesero registrado con éxito");
-    } catch (e) { alert("Error al registrar: " + e.message); }
+    } catch (e) { alert("Error: " + e.message); }
 };
 
 async function renderMesero() {
     const menuSnap = await getDocs(collection(db, "menu"));
-    let opts = "";
+    let opts = '<option value="" disabled selected>Selecciona un platillo...</option>';
     menuSnap.forEach(d => { 
         const p = d.data();
         opts += `<option value="${p.nombre}" data-precio="${p.precio}" data-desc="${p.descripcion}" data-img="${p.imagen}">${p.nombre}</option>`; 
@@ -116,7 +116,6 @@ async function renderMesero() {
         grid.innerHTML = "";
         const ocupadas = {};
         snap.forEach(doc => { ocupadas[doc.id] = doc.data(); });
-
         for(let i=1; i<=10; i++) {
             const dataMesa = ocupadas[i];
             const btn = document.createElement('button');
@@ -129,7 +128,7 @@ async function renderMesero() {
 }
 
 window.sM = async (n, ocupada) => {
-    if(ocupada && ocupada.mesero !== auth.currentUser.email) return alert("Mesa atendida por: " + ocupada.mesero);
+    if(ocupada && ocupada.mesero !== auth.currentUser.email) return alert("Atendida por: " + ocupada.mesero);
     mesaActiva = n;
     document.getElementById('m-val').innerText = n;
     if(!ocupada) {
@@ -145,7 +144,7 @@ window.sM = async (n, ocupada) => {
 
 window.aI = () => {
     const s = document.getElementById('s-it');
-    if(!s.value || !mesaActiva) return alert("Selecciona una mesa");
+    if(!s.value || !mesaActiva) return alert("Selecciona mesa y platillo");
     const opt = s.selectedOptions[0];
     tempItem = { n: opt.value, p: parseInt(opt.dataset.precio), d: opt.dataset.desc, i: opt.dataset.img };
     document.getElementById('cant-nombre-item').innerText = tempItem.n;
