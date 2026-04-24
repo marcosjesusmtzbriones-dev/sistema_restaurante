@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Oráculo del Sabor</title>
+    <title>El Oráculo del Sabor - Cocina Griega</title>
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="grecia.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -12,13 +12,15 @@
     <header>
         <nav class="navbar navbar-expand-lg navbar-dark bg-greek-blue sticky-top">
             <div class="container">
-                <a class="navbar-brand fw-bold" href="#" onclick="window.location.reload()">El Oráculo <span style="color: #c5a059;">del Sabor</span></a>
+                <a class="navbar-brand fw-bold" href="#" onclick="window.renderLanding()">El Oráculo <span style="color: #c5a059;">del Sabor</span></a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="navbarNav">
-                    <ul class="navbar-nav ms-auto">
+                    <ul class="navbar-nav ms-auto" id="nav-public">
                         <li class="nav-item"><a class="nav-link" href="#" onclick="window.renderLanding()">Inicio</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="window.renderMenuPublico()">Menú</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" onclick="window.renderUbicacion()">Ubicación</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" onclick="window.showAuth()">Reservar</a></li>
                     </ul>
                     <button id="btn-logout" class="btn btn-outline-gold btn-sm ms-lg-3 d-none">Salir</button>
@@ -34,24 +36,24 @@
             <div class="modal-content">
                 <div id="ticket-captura" class="bg-white text-dark p-4" style="font-family: 'Courier New', Courier, monospace;">
                     <div class="text-center">
-                        <h5 class="fw-bold m-0">EL ORÁCULO DEL SABOR</h5>
-                        <p class="small">Ticket Digital</p>
+                        <h5 class="fw-bold m-0 text-dark">EL ORÁCULO DEL SABOR</h5>
+                        <p class="small text-dark">Comprobante Digital</p>
                         <hr style="border-top: 2px dashed #000;">
                     </div>
-                    <div id="ticket-detalle"></div>
+                    <div id="ticket-detalle" class="text-dark"></div>
                     <hr style="border-top: 2px dashed #000;">
-                    <p class="text-center small">¡Gracias por su visita!</p>
+                    <p class="text-center small text-dark">¡Opa! Gracias por su visita.</p>
                 </div>
                 <div class="modal-footer bg-dark border-0">
-                    <button class="btn btn-primary w-100 mb-2" onclick="window.compartirTicket()">Enviar / Guardar Foto</button>
-                    <button class="btn btn-outline-light w-100 btn-sm" data-bs-dismiss="modal" onclick="window.limpiarTodo()">Cerrar y Finalizar</button>
+                    <button class="btn btn-primary w-100 mb-2" onclick="window.compartirTicket()">Enviar o Guardar Foto</button>
+                    <button class="btn btn-outline-light w-100 btn-sm" data-bs-dismiss="modal" onclick="window.limpiarTodo()">Cerrar</button>
                 </div>
             </div>
         </div>
     </div>
 
     <footer class="footer mt-auto py-3 bg-dark text-center" style="border-top: 1px solid #c5a059;">
-        <div class="container text-muted small">© 2026 El Oráculo del Sabor</div>
+        <div class="container text-muted small">© 2026 El Oráculo del Sabor - Ecatepec, MX</div>
     </footer>
 
     <script src="bootstrap.bundle.js"></script>
