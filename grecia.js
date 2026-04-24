@@ -45,21 +45,50 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
+
         <section id="menu-section" class="container my-5">
             <h2 class="text-center mb-4" style="color:#c5a059">Nuestro Menú</h2>
             <div id="menu-previo" class="row g-4"></div>
         </section>
+
+        <section id="promos-section" class="py-5 bg-greek-dark">
+            <div class="container text-center">
+                <h2 class="mb-5" style="color:#c5a059">Promociones del Olimpo</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="glass-card h-100 border-gold">
+                            <h3 class="h1 mb-3">2x1</h3>
+                            <h4>Gyros Clásicos</h4>
+                            <p class="text-muted">Todos los martes y jueves</p>
+                            <span class="badge bg-primary">¡Imperdible!</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card h-100 border-gold">
+                            <h3 class="h1 mb-3">15%</h3>
+                            <h4>Descuento Estudiantes</h4>
+                            <p class="text-muted">Presentando credencial vigente</p>
+                            <span class="badge bg-primary">Local Love</span>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card h-100 border-gold">
+                            <h3 class="h1 mb-3">FREE</h3>
+                            <h4>Postre Baklava</h4>
+                            <p class="text-muted">En tu primera reserva online</p>
+                            <span class="badge bg-primary">Bienvenida</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4" style="color:#c5a059">Ubicación</h2>
             <p class="text-white-50 mb-4">Multiplaza Aragón: Av. Carlos Hank González 120, Ecatepec de Morelos, Méx.</p>
             <div class="glass-card p-0 overflow-hidden mb-3">
-                <iframe 
-                    width="100%" 
-                    height="450" 
-                    style="border:0" 
-                    loading="lazy" 
-                    allowfullscreen 
-                    src="https://maps.google.com/maps?q=Multiplaza%20Aragon%20Ecatepec&t=&z=15&ie=UTF8&iwloc=&output=embed">
+                <iframe width="100%" height="450" style="border:0" loading="lazy" allowfullscreen 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.334415840939!2d-99.0306121252119!3d19.527357437145703!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb9631778941%3A0x28994992bad2d28d!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713915000000!5m2!1ses-419!2smx">
                 </iframe>
             </div>
         </section>`;
