@@ -51,8 +51,16 @@ window.renderLanding = async () => {
         </section>
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4" style="color:#c5a059">Ubicación</h2>
+            <p class="text-white-50 mb-4">Multiplaza Aragón: Av. Carlos Hank González 120, Ecatepec de Morelos, Méx.</p>
             <div class="glass-card p-0 overflow-hidden mb-3">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d582.4968595503028!2d-99.0306126!3d19.5960098!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f06f527c9451%3A0xc3163b44b829631b!2sEcatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses-419!2smx!4v1713915000000!5m2!1ses-419!2smx" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m12!1m3!1d3760.1000!2d-99.0270!3d19.5340!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb1ea7a7172d%3A0xc59529cebab2d28d!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713915000000!5m2!1ses-419!2smx" 
+                    width="100%" 
+                    height="450" 
+                    style="border:0;" 
+                    allowfullscreen="" 
+                    loading="lazy">
+                </iframe>
             </div>
         </section>`;
     document.getElementById('main-content').innerHTML = html;
@@ -137,7 +145,7 @@ window.registrarMesero = async () => {
         const tApp = initializeApp(firebaseConfig, "temp");
         const res = await createUserWithEmailAndPassword(getAuth(tApp), e, p);
         await setDoc(doc(db, "usuarios", res.user.uid), { nombre: n, correo: e, rol: "mesero" });
-        alert("Mesero registrado con éxito");
+        alert("Mesero registrado");
     } catch (err) { alert(err.message); }
 };
 
