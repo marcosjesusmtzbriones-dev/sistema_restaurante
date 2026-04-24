@@ -88,7 +88,7 @@ window.renderLanding = async () => {
             <p class="text-white-50 mb-4">Multiplaza Aragón: Av. Central 120, Ecatepec de Morelos, Méx.</p>
             <div class="glass-card p-0 overflow-hidden mb-3" style="height: 450px;">
                 <iframe width="100%" height="100%" style="border:0" loading="lazy" allowfullscreen 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.323565979507!2d-99.0305886241289!3d19.527715737155694!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb118f94e9f7%3A0xc3f58a5e1975e507!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713910000000!5m2!1ses-419!2smx">
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.316875089311!2d-99.02986422394595!3d19.52899478177112!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb196f7c9e03%3A0x8670d90d7967406a!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713916000000!5m2!1ses-419!2smx">
                 </iframe>
             </div>
         </section>`;
