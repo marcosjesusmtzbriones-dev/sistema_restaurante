@@ -28,13 +28,28 @@ body {
 }
 
 .form-control {
-    background: rgba(255, 255, 255, 0.1) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.12) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
     color: #ffffff !important;
     font-size: 16px !important;
 }
 
-.form-control::placeholder { color: rgba(255,255,255,0.5); }
+.form-control:focus {
+    background: rgba(255, 255, 255, 0.15) !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 8px rgba(197, 160, 89, 0.4);
+}
+
+select#s-it {
+    background-color: rgba(255, 255, 255, 0.12) !important;
+    color: #ffffff !important;
+    font-weight: 500;
+}
+
+select#s-it option {
+    background-color: #1e293b !important;
+    color: #ffffff !important;
+}
 
 .btn-primary {
     background-color: var(--accent-gold) !important;
