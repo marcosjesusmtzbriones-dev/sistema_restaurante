@@ -85,13 +85,13 @@ window.renderLanding = async () => {
 
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4" style="color:#c5a059">Ubicación</h2>
-            <p class="text-white-50 mb-4">Multiplaza Aragón: Av. Carlos Hank González 120, Rinconada de Aragón, Ecatepec.</p>
+            <p class="text-white-50 mb-4">Multiplaza Aragón: Av. Central 120, Ecatepec de Morelos, Méx.</p>
             <div class="glass-card p-0 overflow-hidden mb-3" style="height: 450px;">
                 <iframe 
                     width="100%" 
                     height="100%" 
                     style="border:0;" 
-                    src="https://maps.google.com/?cid=6456125117966026254&g_mp=Cidnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLlNlYXJjaFRleHQ1" 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.301550269094!2d-99.03046032415174!3d19.52876618177241!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f9a7a7a40c21%3A0x959549cebac2d28d!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714000000000!5m2!1ses-419!2smx" 
                     allowfullscreen="" 
                     loading="lazy" 
                     referrerpolicy="no-referrer-when-downgrade">
