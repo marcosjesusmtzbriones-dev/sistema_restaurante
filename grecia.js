@@ -20,9 +20,22 @@ let pedidoLocal = [];
 let prodTemp = null;
 let cantTemp = 1;
 
+window.scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) {
+        el.scrollIntoView({ behavior: 'smooth' });
+    } else {
+        window.renderLanding().then(() => {
+            setTimeout(() => {
+                document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
+            }, 150);
+        });
+    }
+};
+
 window.renderLanding = async () => {
     let html = `
-        <section class="hero-section text-center text-white d-flex align-items-center justify-content-center">
+        <section id="inicio" class="hero-section text-center text-white d-flex align-items-center justify-content-center">
             <div>
                 <h1 class="display-3 fw-bold">El Oráculo <span style="color:#c5a059">del Sabor</span></h1>
                 <p class="lead">Tradición Griega en Ecatepec</p>
@@ -32,24 +45,35 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
-        <section class="container my-5"><h2 class="text-center mb-4" style="color:#c5a059">Menú</h2><div id="menu-previo" class="row g-4"></div></section>
-        <section class="container my-5 text-center">
+        <section id="menu-section" class="container my-5">
+            <h2 class="text-center mb-4" style="color:#c5a059">Nuestro Menú</h2>
+            <div id="menu-previo" class="row g-4"></div>
+        </section>
+        <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4" style="color:#c5a059">Ubicación</h2>
             <div class="glass-card p-0 overflow-hidden mb-3">
-                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3759.1234!2d-99.0312!3d19.6012!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDM2JzA0LjMiTiA5OcKwMDEnNTIuMyJX!5e0!3m2!1ses-419!2smx!4v1620000000000" width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d582.4968595503028!2d-99.0306126!3d19.5960098!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f06f527c9451%3A0xc3163b44b829631b!2sEcatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses-419!2smx!4v1713915000000!5m2!1ses-419!2smx" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
     document.getElementById('main-content').innerHTML = html;
-    window.cargarMenuPrevio();
+    await window.cargarMenuPrevio();
 };
 
 window.cargarMenuPrevio = async () => {
     const snap = await getDocs(collection(db, "menu"));
     const container = document.getElementById('menu-previo');
     if(!container) return;
+    container.innerHTML = "";
     snap.forEach(doc => {
         const p = doc.data();
-        container.innerHTML += `<div class="col-md-4"><div class="glass-card text-center h-100"><img src="${p.imagen}" class="img-fluid rounded mb-3" style="height:180px; width:100%; object-fit:cover;"><h4>${p.nombre}</h4><h5 style="color:#c5a059">$${p.precio}</h5></div></div>`;
+        container.innerHTML += `
+            <div class="col-md-4">
+                <div class="glass-card text-center h-100">
+                    <img src="${p.imagen}" class="img-fluid rounded mb-3" style="height:180px; width:100%; object-fit:cover;">
+                    <h4>${p.nombre}</h4>
+                    <h5 style="color:#c5a059">$${p.precio}</h5>
+                </div>
+            </div>`;
     });
 };
 
@@ -151,8 +175,19 @@ window.renderReservaCliente = () => {
 window.saveReserva = async () => {
     const f = document.getElementById('res-f').value;
     const h = document.getElementById('res-h').value;
+    const ticketDetalle = document.getElementById('ticket-detalle');
+    ticketDetalle.innerHTML = `<p><b>Mesa:</b> ${mesaActiva}</p><p><b>Fecha:</b> ${f}</p><p><b>Hora:</b> ${h}</p>`;
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), { cliente: auth.currentUser.email, fecha: f, hora: h, estado: "reservada", productos: [], total: 0 });
-    alert("Reserva exitosa");
+    new bootstrap.Modal('#modalTicket').show();
+};
+
+window.compartirTicket = () => {
+    html2canvas(document.querySelector("#ticket-captura")).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Reserva_Oraculo.png';
+        link.href = canvas.toDataURL();
+        link.click();
+    });
 };
 
 window.renderMesero = () => {
@@ -261,7 +296,7 @@ window.generarTicket = () => {
     document.getElementById('main-content').innerHTML = `
         <div class="p-4 bg-white text-dark text-center" style="font-family: monospace; width: 320px; margin: 50px auto; border: 1px solid #ccc;">
             <h3>EL ORÁCULO DEL SABOR</h3><p>TICKET DE CONSUMO</p><hr>
-            <p>MESA: ${mesaActiva} | TIEMPO: 0 min</p><hr>
+            <p>MESA: ${mesaActiva}</p><hr>
             <div id="items-ticket"></div><hr>
             <h4>TOTAL: $${total}</h4>
             <button class="btn btn-dark w-100 mt-3" onclick="window.cerrarYLimpiar()">Cerrar y Limpiar Mesa</button>
