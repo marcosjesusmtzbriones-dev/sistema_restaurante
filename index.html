@@ -3,9 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>El Oráculo del Sabor - Cocina Griega</title>
+    <title>El Oráculo del Sabor</title>
     <link rel="stylesheet" href="bootstrap.min.css">
     <link rel="stylesheet" href="grecia.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 </head>
 <body class="d-flex flex-column min-vh-100">
     <header>
@@ -18,8 +19,6 @@
                 <div class="collapse navbar-collapse" id="navbarNav">
                     <ul class="navbar-nav ms-auto">
                         <li class="nav-item"><a class="nav-link" href="#" onclick="window.renderLanding()">Inicio</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" onclick="window.renderMenuPublico()">Menú</a></li>
-                        <li class="nav-item"><a class="nav-link" href="#" onclick="window.renderUbicacion()">Ubicación</a></li>
                         <li class="nav-item"><a class="nav-link" href="#" onclick="window.showAuth()">Reservar</a></li>
                     </ul>
                     <button id="btn-logout" class="btn btn-outline-gold btn-sm ms-lg-3 d-none">Salir</button>
@@ -28,28 +27,31 @@
         </nav>
     </header>
 
-    <main id="main-content" class="flex-grow-1">
-        </main>
+    <main id="main-content" class="flex-grow-1"></main>
 
-    <div class="modal fade" id="modalCantidad" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered">
-            <div class="modal-content glass-card p-0" style="border: 1px solid #c5a059;">
-                <div class="modal-body text-center p-4">
-                    <h4 id="cant-nombre-item" style="color: #c5a059;"></h4>
-                    <img id="cant-img-item" src="" class="img-fluid rounded my-3 border-gold" style="max-height: 180px; width: 100%; object-fit: cover;">
-                    <div class="d-flex justify-content-center align-items-center gap-4">
-                        <button class="btn btn-outline-gold rounded-circle" onclick="window.modCant(-1)" style="width: 45px; height: 45px;">-</button>
-                        <h1 id="cant-num" class="m-0 fw-bold" style="color: #ffca28; min-width: 60px;">1</h1>
-                        <button class="btn btn-outline-gold rounded-circle" onclick="window.modCant(1)" style="width: 45px; height: 45px;">+</button>
+    <div class="modal fade" id="modalTicket" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-sm modal-dialog-centered">
+            <div class="modal-content">
+                <div id="ticket-captura" class="bg-white text-dark p-4" style="font-family: 'Courier New', Courier, monospace;">
+                    <div class="text-center">
+                        <h5 class="fw-bold m-0">EL ORÁCULO DEL SABOR</h5>
+                        <p class="small">Ticket Digital</p>
+                        <hr style="border-top: 2px dashed #000;">
                     </div>
-                    <button class="btn btn-primary w-100 mt-4" onclick="window.confirmarAgregado()">Confirmar</button>
+                    <div id="ticket-detalle"></div>
+                    <hr style="border-top: 2px dashed #000;">
+                    <p class="text-center small">¡Gracias por su visita!</p>
+                </div>
+                <div class="modal-footer bg-dark border-0">
+                    <button class="btn btn-primary w-100 mb-2" onclick="window.compartirTicket()">Enviar / Guardar Foto</button>
+                    <button class="btn btn-outline-light w-100 btn-sm" data-bs-dismiss="modal" onclick="window.limpiarTodo()">Cerrar y Finalizar</button>
                 </div>
             </div>
         </div>
     </div>
 
     <footer class="footer mt-auto py-3 bg-dark text-center" style="border-top: 1px solid #c5a059;">
-        <div class="container text-muted small">© 2026 El Oráculo del Sabor - Ecatepec, MX</div>
+        <div class="container text-muted small">© 2026 El Oráculo del Sabor</div>
     </footer>
 
     <script src="bootstrap.bundle.js"></script>
