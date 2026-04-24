@@ -151,6 +151,10 @@ window.saveReserva = async () => {
 
 window.renderMesero = () => {
     document.getElementById('main-content').innerHTML = `
+        <style>
+            select option { background-color: #1a1a1a !important; color: white !important; }
+            #select-platillo { background-color: rgba(255,255,255,0.1); color: white !important; border: 1px solid #c5a059; }
+        </style>
         <div class="container my-5">
             <h2 class="text-center mb-4" style="color:#c5a059">Panel de Atención</h2>
             <div class="row">
@@ -160,7 +164,9 @@ window.renderMesero = () => {
                         <h3 class="text-center">Mesa: <span id="m-atend" style="color:#c5a059">--</span></h3>
                         <div class="mb-3">
                             <label class="form-label">Agregar Platillo:</label>
-                            <select id="select-platillo" class="form-control" onchange="window.prepararPedido(this.value)"><option value="">Selecciona...</option></select>
+                            <select id="select-platillo" class="form-select" onchange="window.prepararPedido(this.value)">
+                                <option value="" selected disabled>Selecciona...</option>
+                            </select>
                         </div>
                         <div id="lista-pedido" class="mb-3"></div>
                         <div class="d-flex justify-content-between mb-3"><h4>Total:</h4><h4 style="color:#c5a059">$<span id="total-atencion">0</span></h4></div>
@@ -234,6 +240,7 @@ window.confirmarProducto = async () => {
     await updateDoc(doc(db, "mesas_activas", mesaActiva.toString()), { productos: pedidoLocal, total: total });
     bootstrap.Modal.getInstance('#modalCantidad').hide();
     window.renderListaPedido();
+    document.getElementById('select-platillo').value = "";
 };
 
 window.renderListaPedido = () => {
