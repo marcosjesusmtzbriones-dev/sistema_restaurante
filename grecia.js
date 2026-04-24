@@ -1,6 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
-import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, onSnapshot, serverTimestamp, deleteDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
+import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, onSnapshot, serverTimestamp, deleteDoc, updateDoc } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDPuAu5691El4Xbh-ap59FsRAgdNWRy5c0",
@@ -15,178 +15,164 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-let carrito = [];
 let mesaActiva = null;
-let tempItem = null;
-let cantidadTemp = 1;
+let carrito = [];
 
-document.getElementById('btn-login').onclick = async () => {
-    const e = document.getElementById('email').value;
-    const p = document.getElementById('password').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Datos incorrectos"); }
+// --- VISTAS PÚBLICAS ---
+window.renderLanding = () => {
+    document.getElementById('main-content').innerHTML = `
+        <section class="hero-section text-white">
+            <div>
+                <h1 class="display-3 fw-bold">Sabores del <span style="color:var(--accent-gold)">Olimpo</span></h1>
+                <p class="lead">La experiencia griega más auténtica de Ecatepec</p>
+                <button class="btn btn-primary btn-lg mt-3" onclick="window.showAuth()">RESERVAR AHORA</button>
+            </div>
+        </section>
+        <section class="container my-5">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="glass-card promo-card">
+                        <h3 style="color:var(--accent-gold)">Promoción del Mes</h3>
+                        <p>2x1 en Gyros clásicos todos los martes y jueves.</p>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="glass-card promo-card">
+                        <h3 style="color:var(--accent-gold)">Noche de Meze</h3>
+                        <p>Vino griego de cortesía en reservaciones de más de 4 personas.</p>
+                    </div>
+                </div>
+            </div>
+        </section>`;
 };
 
-document.getElementById('btn-logout').onclick = () => signOut(auth);
-
-onAuthStateChanged(auth, async (user) => {
-    if (user) {
-        const docSnap = await getDoc(doc(db, "usuarios", user.uid));
-        if (docSnap.exists()) { renderInterfaz(docSnap.data()); }
-    } else {
-        document.getElementById('section-auth').classList.remove('d-none');
-        document.getElementById('section-app').classList.add('d-none');
-        document.getElementById('btn-logout').classList.add('d-none');
-    }
-});
-
-function renderInterfaz(user) {
-    document.getElementById('section-auth').classList.add('d-none');
-    document.getElementById('section-app').classList.remove('d-none');
-    document.getElementById('btn-logout').classList.remove('d-none');
-    document.getElementById('panel-bienvenida').innerHTML = `<h2 style="color:#c5a059;">${user.nombre}</h2><p class="small">${user.rol.toUpperCase()}</p>`;
-    if (user.rol === 'gerente') { renderGerente(); } else { renderMesero(); }
-}
-
-function renderGerente() {
-    document.getElementById('render-area').innerHTML = `
-        <div class="col-md-6">
-            <div class="glass-card">
-                <h4>Nuevo Platillo</h4>
-                <input id="p-nom" class="form-control mb-2" placeholder="Nombre">
-                <input id="p-pre" type="number" class="form-control mb-2" placeholder="Precio">
-                <input id="p-des" class="form-control mb-2" placeholder="Descripción">
-                <input id="p-img" class="form-control mb-2" placeholder="URL Imagen">
-                <select id="p-tie" class="form-control mb-3"><option value="Entrada">Entrada</option><option value="Fuerte">Fuerte</option><option value="Postre">Postre</option></select>
-                <button onclick="window.addP()" class="btn btn-primary w-100">Guardar Platillo</button>
+window.renderUbicacion = () => {
+    document.getElementById('main-content').innerHTML = `
+        <div class="container my-5 text-center">
+            <h2 class="mb-4" style="color:var(--accent-gold)">Encuéntranos</h2>
+            <div class="glass-card p-0 overflow-hidden">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d5423.82!2d-99.03!3d19.6!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDM2JzAwLjAiTiA5OcKwMDEnNDguMCJX!5e0!3m2!1ses!2smx!4v1700000000000!5m2!1ses!2smx" width="100%" height="450" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
             </div>
-        </div>
-        <div class="col-md-6">
-            <div class="glass-card">
-                <h4>Nuevo Mesero</h4>
-                <input id="m-em" class="form-control mb-2" placeholder="Email" autocomplete="off">
-                <input id="m-ps" type="password" class="form-control mb-3" placeholder="Contraseña deseada" autocomplete="new-password">
-                <button onclick="window.regM()" class="btn btn-outline-gold w-100">Registrar Mesero</button>
-            </div>
+            <p class="mt-3">Av. Central, Ecatepec de Morelos, Edo. Méx.</p>
         </div>`;
-}
-
-window.addP = async () => {
-    const nombre = document.getElementById('p-nom').value;
-    const precio = parseInt(document.getElementById('p-pre').value);
-    const tiempo = document.getElementById('p-tie').value;
-    const descripcion = document.getElementById('p-des').value;
-    const imagen = document.getElementById('p-img').value;
-    if(!nombre || !precio) return alert("Llena los campos");
-    await addDoc(collection(db, "menu"), { nombre, precio, tiempo, descripcion, imagen });
-    alert("Platillo Agregado");
 };
 
-window.regM = async () => {
-    const email = document.getElementById('m-em').value;
-    const pass = document.getElementById('m-ps').value;
-    if(!email || !pass) return alert("Completa los datos");
-    try {
-        const res = await createUserWithEmailAndPassword(auth, email, pass);
-        await setDoc(doc(db, "usuarios", res.user.uid), { nombre: "Mesero", correo: email, rol: "mesero" });
-        alert("Mesero registrado con éxito");
-    } catch (e) { alert("Error: " + e.message); }
+// --- AUTENTICACIÓN ---
+window.showAuth = () => {
+    document.getElementById('main-content').innerHTML = `
+        <div class="container my-5"><div class="row justify-content-center"><div class="col-md-5">
+            <div class="glass-card">
+                <h3 class="text-center mb-4" style="color:var(--accent-gold)">Bienvenido</h3>
+                <input id="auth-e" class="form-control mb-2" placeholder="Correo">
+                <input id="auth-p" type="password" class="form-control mb-3" placeholder="Contraseña">
+                <button onclick="window.handleLogin()" class="btn btn-primary w-100 mb-2">Entrar</button>
+                <button onclick="window.showRegister()" class="btn btn-outline-gold w-100 btn-sm">Registrarme</button>
+            </div>
+        </div></div></div>`;
 };
 
-async function renderMesero() {
-    const menuSnap = await getDocs(collection(db, "menu"));
-    let opts = '<option value="" disabled selected>Selecciona un platillo...</option>';
-    menuSnap.forEach(d => { 
-        const p = d.data();
-        opts += `<option value="${p.nombre}" data-precio="${p.precio}" data-desc="${p.descripcion}" data-img="${p.imagen}">${p.nombre}</option>`; 
-    });
-    
-    document.getElementById('render-area').innerHTML = `
-        <div class="col-md-5"><div class="glass-card"><h4>Mesas</h4><div id="grid-mesas" class="grid-mesas"></div></div></div>
-        <div class="col-md-7"><div class="glass-card">
-            <h4>Mesa: <span id="m-val" style="color:#c5a059;">--</span></h4>
-            <select id="s-it" class="form-control mb-3">${opts}</select>
-            <button onclick="window.aI()" class="btn btn-primary w-100 mb-3">Agregar</button>
-            <ul id="lista" class="list-group mb-3"></ul>
-            <h5 class="d-flex justify-content-between">Total: <span>$<span id="tot">0</span></span></h5>
-            <button onclick="window.cT()" class="btn btn-outline-gold w-100 mt-2">Ticket y Cerrar</button>
+window.handleLogin = async () => {
+    const e = document.getElementById('auth-e').value;
+    const p = document.getElementById('auth-p').value;
+    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Credenciales inválidas"); }
+};
+
+// --- SISTEMA DE RESERVAS (CLIENTE) ---
+async function renderCliente() {
+    document.getElementById('main-content').innerHTML = `
+        <div class="container my-5"><div class="glass-card">
+            <h3 style="color:var(--accent-gold)">Realizar Reservación</h3>
+            <div class="row mt-4">
+                <div class="col-md-4">
+                    <label>Fecha:</label><input id="res-f" type="date" class="form-control mb-3">
+                    <label>Hora:</label><select id="res-h" class="form-control mb-4">
+                        <option>14:00</option><option>16:00</option><option>20:00</option>
+                    </select>
+                </div>
+                <div class="col-md-8">
+                    <label>Selecciona tu Mesa:</label>
+                    <div id="grid-reserva" class="grid-mesas mt-2"></div>
+                </div>
+            </div>
+            <button id="btn-confirmar-res" class="btn btn-primary w-100 mt-4 d-none" onclick="window.saveReserva()">Confirmar Reservación</button>
         </div></div>`;
 
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
-        const grid = document.getElementById('grid-mesas');
+        const grid = document.getElementById('grid-reserva');
         grid.innerHTML = "";
-        const ocupadas = {};
-        snap.forEach(doc => { ocupadas[doc.id] = doc.data(); });
+        const ocupadas = {}; snap.forEach(d => ocupadas[d.id] = true);
         for(let i=1; i<=10; i++) {
-            const dataMesa = ocupadas[i];
             const btn = document.createElement('button');
-            btn.className = `btn m-btn ${dataMesa ? 'ocupada' : ''} ${mesaActiva == i ? 'seleccionada' : ''}`;
+            btn.className = `btn m-btn ${ocupadas[i] ? 'ocupada' : ''}`;
             btn.innerText = `M${i}`;
-            btn.onclick = () => window.sM(i, dataMesa);
+            btn.disabled = ocupadas[i];
+            btn.onclick = () => { mesaActiva = i; document.getElementById('btn-confirmar-res').classList.remove('d-none'); };
             grid.appendChild(btn);
         }
     });
 }
 
-window.sM = async (n, ocupada) => {
-    if(ocupada && ocupada.mesero !== auth.currentUser.email) return alert("Atendida por: " + ocupada.mesero);
-    mesaActiva = n;
-    document.getElementById('m-val').innerText = n;
-    if(!ocupada) {
-        await setDoc(doc(db, "mesas_activas", n.toString()), { 
-            inicio: new Date().getTime(),
-            mesero: auth.currentUser.email 
+window.saveReserva = async () => {
+    const f = document.getElementById('res-f').value;
+    const h = document.getElementById('res-h').value;
+    if(!f || !mesaActiva) return alert("Completa los datos");
+    await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), {
+        cliente: auth.currentUser.email,
+        fecha: f,
+        hora: h,
+        estado: "reservada",
+        inicio: new Date().getTime()
+    });
+    alert("Reservación confirmada. Te esperamos.");
+    location.reload();
+};
+
+// --- SISTEMA DE TRABAJO (MESERO) ---
+async function renderMesero() {
+    document.getElementById('main-content').innerHTML = `
+        <div class="container my-5"><div class="row">
+            <div class="col-md-4"><div class="glass-card"><h4>Mesas</h4><div id="grid-mesas-m" class="grid-mesas"></div></div></div>
+            <div id="area-atencion" class="col-md-8 d-none">
+                <div class="glass-card">
+                    <h4>Mesa <span id="m-atend"></span></h4>
+                    <ul id="lista-p" class="list-group mb-3"></ul>
+                    <button class="btn btn-primary w-100" onclick="window.cT()">Generar Ticket</button>
+                </div>
+            </div>
+        </div></div>`;
+
+    onSnapshot(collection(db, "mesas_activas"), (snap) => {
+        const grid = document.getElementById('grid-mesas-m');
+        grid.innerHTML = "";
+        snap.forEach(d => {
+            const m = d.data();
+            const btn = document.createElement('button');
+            const soyYo = m.mesero_asignado === auth.currentUser.email;
+            btn.className = `btn m-btn ${m.estado === 'atendiendo' && !soyYo ? 'atendida' : 'ocupada'}`;
+            btn.innerText = `M${d.id}`;
+            btn.onclick = () => window.atenderMesa(d.id, m);
+            grid.appendChild(btn);
         });
-        carrito = [];
-        document.getElementById('lista').innerHTML = "";
-        document.getElementById('tot').innerText = "0";
-    }
+    });
+}
+
+window.atenderMesa = async (id, data) => {
+    if(data.mesero_asignado && data.mesero_asignado !== auth.currentUser.email) return alert("Mesa asignada a otro mesero.");
+    mesaActiva = id;
+    await updateDoc(doc(db, "mesas_activas", id), { mesero_asignado: auth.currentUser.email, estado: 'atendiendo' });
+    document.getElementById('area-atencion').classList.remove('d-none');
+    document.getElementById('m-atend').innerText = id;
 };
 
-window.aI = () => {
-    const s = document.getElementById('s-it');
-    if(!s.value || !mesaActiva) return alert("Selecciona mesa y platillo");
-    const opt = s.selectedOptions[0];
-    tempItem = { n: opt.value, p: parseInt(opt.dataset.precio), d: opt.dataset.desc, i: opt.dataset.img };
-    document.getElementById('cant-nombre-item').innerText = tempItem.n;
-    document.getElementById('cant-desc-item').innerText = tempItem.d || "Delicioso platillo griego";
-    document.getElementById('cant-img-item').src = tempItem.i || 'https://via.placeholder.com/150';
-    document.getElementById('cant-num').innerText = "1";
-    cantidadTemp = 1;
-    new bootstrap.Modal(document.getElementById('modalCantidad')).show();
-};
+onAuthStateChanged(auth, async (u) => {
+    if(u) {
+        const d = await getDoc(doc(db, "usuarios", u.uid));
+        const user = d.data();
+        document.getElementById('btn-logout').classList.remove('d-none');
+        if(user.rol === 'cliente') renderCliente();
+        else if(user.rol === 'mesero') renderMesero();
+        else renderGerente();
+    } else { renderLanding(); }
+});
 
-window.modCant = (v) => {
-    cantidadTemp = Math.max(1, cantidadTemp + v);
-    document.getElementById('cant-num').innerText = cantidadTemp;
-};
-
-window.confirmarAgregado = () => {
-    const sub = tempItem.p * cantidadTemp;
-    carrito.push({ n: tempItem.n, p: tempItem.p, c: cantidadTemp });
-    document.getElementById('lista').innerHTML += `<li class="list-group-item d-flex justify-content-between small"><span>${cantidadTemp}x ${tempItem.n}</span><span>$${sub}</span></li>`;
-    const t = document.getElementById('tot');
-    t.innerText = parseInt(t.innerText) + sub;
-    bootstrap.Modal.getInstance(document.getElementById('modalCantidad')).hide();
-};
-
-window.cT = async () => {
-    if (!mesaActiva || carrito.length === 0) return alert("Agrega productos");
-    const mesaDoc = await getDoc(doc(db, "mesas_activas", mesaActiva.toString()));
-    const duracion = Math.floor((new Date().getTime() - mesaDoc.data().inicio) / 60000);
-    const total = document.getElementById('tot').innerText;
-    let det = `<p class="small">MESA: ${mesaActiva} | TIEMPO: ${duracion} min</p><hr>`;
-    carrito.forEach(i => { det += `<div class="ticket-row small"><span>${i.c}x ${i.n}</span><span>$${i.p * i.c}</span></div>`; });
-    det += `<hr><div class="ticket-row fw-bold"><span>TOTAL:</span><span>$${total}</span></div>`;
-    document.getElementById('ticket-detalle').innerHTML = det;
-    new bootstrap.Modal(document.getElementById('modalTicket')).show();
-    await addDoc(collection(db, "ventas"), { mesa: mesaActiva, total: parseInt(total), duracion, fecha: serverTimestamp() });
-};
-
-window.limpiarTodo = async () => {
-    if(!mesaActiva) return;
-    await deleteDoc(doc(db, "mesas_activas", mesaActiva.toString()));
-    carrito = []; mesaActiva = null;
-    document.getElementById('lista').innerHTML = "";
-    document.getElementById('tot').innerText = "0";
-    document.getElementById('m-val').innerText = "--";
-};
+window.renderLanding();
