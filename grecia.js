@@ -45,12 +45,10 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
-
         <section id="menu-section" class="container my-5">
             <h2 class="text-center mb-4" style="color:#c5a059">Nuestro Menú</h2>
             <div id="menu-previo" class="row g-4"></div>
         </section>
-
         <section id="promos-section" class="py-5 bg-greek-dark">
             <div class="container text-center">
                 <h2 class="mb-5" style="color:#c5a059">Promociones del Olimpo</h2>
@@ -82,13 +80,12 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
-
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4" style="color:#c5a059">Ubicación</h2>
             <p class="text-white-50 mb-4">Multiplaza Aragón: Av. Central 120, Ecatepec de Morelos, Méx.</p>
             <div class="glass-card p-0 overflow-hidden mb-3" style="height: 450px;">
                 <iframe width="100%" height="100%" style="border:0" loading="lazy" allowfullscreen 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.316875089311!2d-99.02986422394595!3d19.52899478177112!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb196f7c9e03%3A0x8670d90d7967406a!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713916000000!5m2!1ses-419!2smx">
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m12!1m3!1d3760.3201460599147!2d-99.03309602517861!3d19.527903881771122!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb196e864d39%3A0x6649f87c1c045437!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713915123456!5m2!1ses-419!2smx">
                 </iframe>
             </div>
         </section>`;
@@ -302,8 +299,6 @@ window.atenderMesa = async (id, data) => {
     window.renderListaPedido();
 };
 
-window.modCant = (v) => { cantTemp = Math.max(1, cantTemp + v); document.getElementById('p-cant-modal').innerText = cantTemp; };
-
 window.prepararPedido = (val) => {
     if(!val) return;
     prodTemp = JSON.parse(val); cantTemp = 1;
@@ -311,6 +306,8 @@ window.prepararPedido = (val) => {
     document.getElementById('p-cant-modal').innerText = cantTemp;
     new bootstrap.Modal('#modalCantidad').show();
 };
+
+window.modCant = (v) => { cantTemp = Math.max(1, cantTemp + v); document.getElementById('p-cant-modal').innerText = cantTemp; };
 
 window.confirmarProducto = async () => {
     pedidoLocal.push({ nombre: prodTemp.nombre, cantidad: cantTemp, subtotal: prodTemp.precio * cantTemp });
