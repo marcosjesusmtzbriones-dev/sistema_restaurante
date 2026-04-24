@@ -32,7 +32,13 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
-        <section class="container my-5"><h2 class="text-center mb-4" style="color:#c5a059">Menú</h2><div id="menu-previo" class="row g-4"></div></section>`;
+        <section class="container my-5"><h2 class="text-center mb-4" style="color:#c5a059">Menú</h2><div id="menu-previo" class="row g-4"></div></section>
+        <section class="container my-5 text-center">
+            <h2 class="mb-4" style="color:#c5a059">Ubicación</h2>
+            <div class="glass-card p-0 overflow-hidden mb-3">
+                <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3759.1234!2d-99.0312!3d19.6012!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDM2JzA0LjMiTiA5OcKwMDEnNTIuMyJX!5e0!3m2!1ses-419!2smx!4v1620000000000" width="100%" height="350" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+            </div>
+        </section>`;
     document.getElementById('main-content').innerHTML = html;
     window.cargarMenuPrevio();
 };
