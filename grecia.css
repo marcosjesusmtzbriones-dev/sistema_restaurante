@@ -4,14 +4,12 @@
     --greek-blue: #1b3a5d;
     --soft-white: #f8f9fa;
     --glass-bg: rgba(10, 25, 47, 0.98);
-    --glass-border: rgba(197, 160, 89, 0.3);
 }
 
 body {
     background: #0f172a;
     color: var(--soft-white);
     font-family: 'Segoe UI', system-ui, sans-serif;
-    overflow-x: hidden;
 }
 
 .bg-greek-blue {
@@ -21,41 +19,27 @@ body {
 
 .glass-card {
     background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
+    border: 1px solid rgba(197, 160, 89, 0.3);
     border-radius: 1rem;
     padding: 1.5rem;
-    margin-bottom: 1rem;
 }
 
-.form-control {
-    background: rgba(255, 255, 255, 0.12) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-    color: #ffffff !important;
-    font-size: 16px !important;
-}
-
-.form-control:focus {
-    background: rgba(255, 255, 255, 0.15) !important;
-    color: #ffffff !important;
-    box-shadow: 0 0 8px rgba(197, 160, 89, 0.4);
-}
-
-select#s-it {
-    background-color: rgba(255, 255, 255, 0.12) !important;
-    color: #ffffff !important;
-    font-weight: 500;
-}
-
-select#s-it option {
-    background-color: #1e293b !important;
-    color: #ffffff !important;
+.hero-section {
+    height: 60vh;
+    background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://images.unsplash.com/photo-1505575967455-40e256f7377c?q=80&w=1200');
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
 }
 
 .btn-primary {
     background-color: var(--accent-gold) !important;
-    border: none !important;
     color: #1a1a1a !important;
     font-weight: bold;
+    border: none;
 }
 
 .btn-outline-gold {
@@ -70,38 +54,32 @@ select#s-it option {
 }
 
 .m-btn {
-    aspect-ratio: 1 / 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    aspect-ratio: 1/1;
     border-radius: 10px;
-    font-size: 0.8rem;
     border: 1px solid var(--accent-gold);
     color: var(--accent-gold);
     background: transparent;
 }
 
 .m-btn.ocupada {
-    border-color: #ff4d4d !important;
-    color: #ff4d4d !important;
-    background: rgba(255, 77, 77, 0.1) !important;
+    background: rgba(255, 77, 77, 0.2);
+    border-color: #ff4d4d;
+    color: #ff4d4d;
 }
 
-.m-btn.seleccionada {
-    box-shadow: 0 0 15px var(--accent-gold);
-    background: rgba(197, 160, 89, 0.2);
+.m-btn.atendida {
+    background: rgba(0, 212, 255, 0.2);
+    border-color: #00d4ff;
+    color: #00d4ff;
 }
 
-@media (max-width: 576px) {
-    .grid-mesas { grid-template-columns: repeat(4, 1fr); }
-    .glass-card { padding: 1rem; }
+.form-control {
+    background: rgba(255,255,255,0.1) !important;
+    color: white !important;
+    border: 1px solid rgba(255,255,255,0.2) !important;
 }
 
-.list-group-item {
-    background: transparent !important;
-    border-bottom: 1px solid rgba(197, 160, 89, 0.1) !important;
-    color: #fff !important;
+.promo-card {
+    border-left: 5px solid var(--accent-gold);
+    background: rgba(255,255,255,0.05);
 }
-
-.ticket-row { display: flex; justify-content: space-between; }
-.border-gold { border: 1px solid var(--accent-gold) !important; }
