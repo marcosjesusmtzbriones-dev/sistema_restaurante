@@ -90,11 +90,11 @@ window.renderLanding = async () => {
                 <iframe 
                     width="100%" 
                     height="100%" 
-                    style="border:0" 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.339247167666!2d-99.02983752538166!3d19.527027581774352!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fba7a7b74071%3A0x979549ceba02d28d!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713920000000!5m2!1ses-419!2smx" 
+                    style="border:0;" 
                     allowfullscreen="" 
                     loading="lazy" 
-                    referrerpolicy="no-referrer-when-downgrade">
+                    referrerpolicy="no-referrer-when-downgrade" 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.334460599298!2d-99.02980832386343!3d19.527376337119293!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fba7a7b74071%3A0x7b9549cebac2d28d!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713925000000!5m2!1ses-419!2smx">
                 </iframe>
             </div>
         </section>`;
