@@ -2,6 +2,11 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
+// Cargamos la librería para PDF dinámicamente
+const scriptPdf = document.createElement('script');
+scriptPdf.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+document.head.appendChild(scriptPdf);
+
 const firebaseConfig = {
     apiKey: "AIzaSyDPuAu5691El4Xbh-ap59FsRAgdNWRy5c0",
     authDomain: "restaurante-griego.firebaseapp.com",
@@ -52,12 +57,26 @@ const ESTILOS_GLOBALES = `
     .m-btn.ocupada { background: #ff6b6b; border: none; opacity: 0.6; }
     .m-btn.seleccionada { background: var(--gold); color: black; }
     .m-btn.atendida { background: #51cf66; border: none; }
+    
+    #ticket-descarga { padding: 20px; background: white; color: black; font-family: 'Courier New', Courier, monospace; }
     @media print { .no-print { display: none !important; } }
 </style>`;
 
 window.scrollToSection = (id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
+};
+
+window.descargarTicket = () => {
+    const elemento = document.getElementById('ticket-descarga');
+    const opt = {
+        margin: 1,
+        filename: 'Ticket-Reserva-Oraculo.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+    html2pdf().set(opt).from(elemento).save();
 };
 
 window.renderLanding = async () => {
@@ -101,7 +120,7 @@ window.renderLanding = async () => {
         <section id="ubicacion-section" class="container py-5 text-center">
             <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec</p>
             <div class="glass-card p-0 overflow-hidden" style="height: 400px;">
-                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.123!2d-99.029!3d19.534!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f00000000000%3A0x0!2zMTnCsDMyJzAyLjQiTiA5OcKwMDEnNDQuNCJX!5e0!3m2!1ses!2smx!4v1" allowfullscreen="" loading="lazy"></iframe>
+                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3759.124571987515!2d-99.0272216!3d19.5362547!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f00609346513%3A0xc3c5443d3b73315!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714100000000!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
     await window.cargarMenuPrevio();
@@ -176,12 +195,26 @@ window.renderReservaCliente = async () => {
                 <div class="col-lg-5"><div class="glass-card"><h4 class="text-gold mb-3 text-center">Mis Visitas</h4><div id="lista-historial"></div></div></div>
             </div>
         </div>
-        <div class="modal fade" id="modalTicket" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-white text-dark p-4 text-center">
-            <h4 class="fw-bold">RESERVACIÓN EXITOSA</h4><hr>
-            <div id="ticket-info"></div><hr>
-            <p class="small">Muestra este ticket al llegar al restaurante.</p>
-            <button class="btn btn-dark w-100" data-bs-dismiss="modal">LISTO</button>
-        </div></div></div>`;
+        <div class="modal fade" id="modalTicket" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content bg-white text-dark p-0 overflow-hidden">
+                    <div id="ticket-descarga">
+                        <div class="text-center">
+                            <h4 class="fw-bold">EL ORÁCULO DEL SABOR</h4>
+                            <p class="small">Multiplaza Aragón, Ecatepec</p>
+                            <hr style="border-top: 2px dashed #000">
+                            <div id="ticket-info"></div>
+                            <hr style="border-top: 2px dashed #000">
+                            <p class="small">Presenta este comprobante al llegar.<br>¡Buen provecho!</p>
+                        </div>
+                    </div>
+                    <div class="p-3 bg-light d-flex gap-2">
+                        <button class="btn btn-primary w-100" onclick="window.descargarTicket()">DESCARGAR PDF</button>
+                        <button class="btn btn-dark w-100" data-bs-dismiss="modal">CERRAR</button>
+                    </div>
+                </div>
+            </div>
+        </div>`;
 
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
         const grid = document.getElementById('grid-reserva');
@@ -215,10 +248,19 @@ window.saveReserva = async () => {
     const data = { cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, mesa: mesaActiva, estado: "confirmada", productos: [], total: 0 };
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), data);
     const ref = await addDoc(collection(db, "historial_reservas"), data);
-    document.getElementById('ticket-info').innerHTML = `<h3>MESA ${mesaActiva}</h3><p>${f} | ${h}</p><small>Folio: ${ref.id}</small>`;
+    
+    document.getElementById('ticket-info').innerHTML = `
+        <h2 class="fw-bold">MESA ${mesaActiva}</h2>
+        <p class="mb-1"><b>FECHA:</b> ${f}</p>
+        <p class="mb-1"><b>HORA:</b> ${h}</p>
+        <p class="mb-1"><b>PERSONAS:</b> ${p}</p>
+        <p class="mt-3 small"><b>FOLIO:</b><br>${ref.id}</p>
+    `;
+    
     new bootstrap.Modal('#modalTicket').show();
 };
 
+// ... Resto de funciones (Gerente, Mesero, Auth) se mantienen igual ...
 window.cancelarReserva = async (idH, idM) => {
     if(confirm("¿Cancelar reservación?")) {
         await updateDoc(doc(db, "historial_reservas", idH), { estado: "vencida" });
