@@ -31,6 +31,7 @@ const ESTILOS_GLOBALES = `
     .status-finalizada { color: #51cf66; font-weight: bold; }
     .status-confirmada { color: var(--gold); font-weight: bold; }
     .text-gold { color: var(--gold) !important; }
+    .card-admin { background: rgba(255,255,255,0.05); border: 1px solid var(--gold); border-radius: 12px; padding: 20px; height: 100%; }
     @media print { .no-print { display: none !important; } .modal-backdrop { display: none !important; } }
 </style>`;
 
@@ -71,7 +72,7 @@ window.renderLanding = async () => {
             <h2 class="mb-4 text-gold">Ubicación</h2>
             <p class="text-white-50">Visítanos en Multiplaza Aragón, Ecatepec</p>
             <div class="glass-card p-0 overflow-hidden" style="height: 400px;">
-                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.3667232230756!2d-99.0294371!3d19.525893!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb1f478546b3%3A0x67398a87b03b2907!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses!2smx!4v1713000000000" allowfullscreen="" loading="lazy"></iframe>
+                <iframe width="100%" height="100%" style="border:0;" src="http://googleusercontent.com/maps.google.com/7" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
     await window.cargarMenuPrevio();
@@ -215,31 +216,64 @@ window.renderGerente = () => {
     document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
         <div id="inicio"></div>
         <div class="container my-5">
-            <h2 class="text-gold text-center mb-4">Panel de Gerencia</h2>
-            <div class="row justify-content-center">
-                <div class="col-md-6">
-                    <div class="glass-card">
-                        <h4 class="mb-3">Agregar Nuevo Item al Menú</h4>
-                        <label class="small text-white-50">Categoría</label>
-                        <select id="p-categoria" class="form-select mb-3">
+            <h2 class="text-gold text-center mb-5">Panel Administrativo</h2>
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="card-admin">
+                        <h4 class="text-gold mb-3">Gestionar Menú</h4>
+                        <select id="p-categoria" class="form-select mb-2">
                             <option value="bebida">Bebida</option>
                             <option value="entrada">Entrada</option>
                             <option value="plato_fuerte">Plato Fuerte</option>
                             <option value="postre">Postre</option>
                         </select>
-                        <input id="p-nombre" class="form-control mb-2" placeholder="Nombre del producto">
-                        <input id="p-precio" type="number" class="form-control mb-2" placeholder="Precio ($)">
-                        <input id="p-img" class="form-control mb-3" placeholder="URL de la imagen">
-                        <button onclick="window.guardarProducto()" class="btn btn-primary w-100">GUARDAR PRODUCTO</button>
+                        <input id="p-nombre" class="form-control mb-2" placeholder="Nombre">
+                        <input id="p-precio" type="number" class="form-control mb-2" placeholder="Precio">
+                        <input id="p-img" class="form-control mb-3" placeholder="URL Imagen">
+                        <button onclick="window.guardarProducto()" class="btn btn-primary w-100">Guardar Item</button>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="card-admin">
+                        <h4 class="text-gold mb-3">Alta de Meseros</h4>
+                        <input id="m-nombre" class="form-control mb-2" placeholder="Nombre Completo">
+                        <input id="m-email" class="form-control mb-2" placeholder="Correo electrónico">
+                        <input id="m-pass" type="password" class="form-control mb-3" placeholder="Contraseña temporal">
+                        <button onclick="window.crearMesero()" class="btn btn-outline-gold w-100">Registrar Mesero</button>
+                    </div>
+                </div>
+                <div class="col-md-4 text-center">
+                    <div class="card-admin">
+                        <h4 class="text-gold mb-4">Total en Caja</h4>
+                        <h2 id="total-caja" class="display-6 mb-4 text-white">$0</h2>
+                        <button class="btn btn-gold w-100 mb-2" onclick="window.scrollToSection('seccion-ventas')">Ver Detalle de Ventas</button>
                     </div>
                 </div>
             </div>
-            <div class="mt-5">
-                <h4 class="text-gold mb-3">Menú Actual</h4>
-                <div id="lista-menu-gerente" class="row g-3"></div>
+            <div id="seccion-ventas" class="mt-5">
+                <h4 class="text-gold mb-3">Historial Detallado de Ventas</h4>
+                <div class="glass-card table-responsive">
+                    <table class="table table-dark table-hover align-middle">
+                        <thead><tr><th>Fecha / Hora</th><th>Mesa</th><th>Mesero Encargado</th><th>Venta Total</th></tr></thead>
+                        <tbody id="lista-ventas-body"></tbody>
+                    </table>
+                </div>
             </div>
         </div>`;
-    window.cargarMenuRevision();
+    window.cargarHistorialVentas();
+};
+
+window.crearMesero = async () => {
+    const n = document.getElementById('m-nombre').value;
+    const e = document.getElementById('m-email').value;
+    const p = document.getElementById('m-pass').value;
+    if(!n || !e || !p) return alert("Por favor complete todos los datos del mesero");
+    try {
+        const res = await createUserWithEmailAndPassword(auth, e, p);
+        await setDoc(doc(db, "usuarios", res.user.uid), { nombre: n, correo: e, rol: "mesero" });
+        alert("Mesero registrado con éxito en el sistema");
+        window.renderGerente();
+    } catch (err) { alert("Error al registrar: " + err.message); }
 };
 
 window.guardarProducto = async () => {
@@ -247,29 +281,27 @@ window.guardarProducto = async () => {
     const nom = document.getElementById('p-nombre').value;
     const pre = document.getElementById('p-precio').value;
     const img = document.getElementById('p-img').value;
-    if (!nom || !pre || !img) return alert("Por favor, rellena todos los campos");
-    try {
-        await addDoc(collection(db, "menu"), { nombre: nom, precio: parseInt(pre), categoria: cat, imagen: img });
-        alert("¡Producto agregado con éxito!");
-        window.renderGerente();
-    } catch (e) { alert("Error al guardar"); }
+    if (!nom || !pre || !img) return alert("Faltan datos del producto");
+    await addDoc(collection(db, "menu"), { nombre: nom, precio: parseInt(pre), categoria: cat, imagen: img });
+    alert("Producto guardado correctamente"); window.renderGerente();
 };
 
-window.cargarMenuRevision = async () => {
-    const snap = await getDocs(collection(db, "menu"));
-    const container = document.getElementById('lista-menu-gerente');
-    if(!container) return; container.innerHTML = "";
+window.cargarHistorialVentas = async () => {
+    const snap = await getDocs(collection(db, "ventas_finalizadas"));
+    const container = document.getElementById('lista-ventas-body');
+    let totalCaja = 0;
+    container.innerHTML = "";
     snap.forEach(doc => {
-        const p = doc.data();
-        container.innerHTML += `
-            <div class="col-md-3">
-                <div class="glass-card text-center p-2 small">
-                    <img src="${p.imagen}" class="rounded mb-2" style="height:80px; width:100%; object-fit:cover;">
-                    <p class="mb-0"><b>${p.nombre}</b></p>
-                    <span class="text-gold">$${p.precio}</span> | <span class="badge bg-dark">${p.categoria}</span>
-                </div>
-            </div>`;
+        const v = doc.data();
+        totalCaja += v.total;
+        container.innerHTML += `<tr>
+            <td>${v.fecha_venta}</td>
+            <td><span class="badge bg-secondary">Mesa ${v.mesa}</span></td>
+            <td><i class="text-white-50">${v.mesero_nombre || 'Cliente (Auto-servicio)'}</i></td>
+            <td class="text-gold fw-bold">$${v.total}</td>
+        </tr>`;
     });
+    document.getElementById('total-caja').innerText = `$${totalCaja}`;
 };
 
 window.renderMesero = () => {
@@ -363,7 +395,7 @@ window.generarTicketFinal = async () => {
     const qH = query(collection(db, "historial_reservas"), where("mesa", "==", mesaActiva), where("estado", "==", "confirmada"));
     const hSnap = await getDocs(qH);
     hSnap.forEach(async d => await updateDoc(doc(db, "historial_reservas", d.id), { estado: "finalizada" }));
-    await addDoc(collection(db, "ventas_finalizadas"), { ...dataM, mesa: mesaActiva, total: parseInt(total), fecha_venta: new Date().toLocaleString() });
+    await addDoc(collection(db, "ventas_finalizadas"), { ...dataM, mesa: mesaActiva, total: parseInt(total), fecha_venta: new Date().toLocaleString(), mesero_nombre: nombreUsuarioActual });
     document.getElementById('main-content').innerHTML = `
         <div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg" style="font-family: monospace; max-width: 350px;">
             <h4 class="text-center fw-bold">EL ORÁCULO DEL SABOR</h4><hr>
