@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
+// Librería para PDF
 const scriptPdf = document.createElement('script');
 scriptPdf.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
 document.head.appendChild(scriptPdf);
@@ -57,6 +58,7 @@ const ESTILOS_GLOBALES = `
     .m-btn.seleccionada { background: var(--gold); color: black; }
     .m-btn.atendida { background: #51cf66; border: none; }
     
+    #ticket-descarga { padding: 30px; background: white; color: black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     @media print { .no-print { display: none !important; } }
 </style>`;
 
@@ -66,28 +68,15 @@ window.scrollToSection = (id) => {
 };
 
 window.descargarTicket = () => {
-    const elementoOriginal = document.getElementById('ticket-descarga');
-    const copia = elementoOriginal.cloneNode(true);
-    
-    copia.style.position = 'fixed';
-    copia.style.top = '0';
-    copia.style.left = '0';
-    copia.style.width = '600px';
-    copia.style.zIndex = '-9999';
-    copia.style.background = '#ffffff';
-    document.body.appendChild(copia);
-
+    const elemento = document.getElementById('ticket-descarga');
     const opt = {
         margin: 0.5,
         filename: 'Ticket-Reserva-Oraculo.pdf',
-        image: { type: 'jpeg', quality: 1 },
-        html2canvas: { scale: 2, useCORS: true },
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 3 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-
-    html2pdf().set(opt).from(copia).save().then(() => {
-        document.body.removeChild(copia);
-    });
+    html2pdf().set(opt).from(elemento).save();
 };
 
 window.renderLanding = async () => {
@@ -112,7 +101,7 @@ window.renderLanding = async () => {
         </section>
         <section id="ubicacion-section" class="container py-5 text-center">
             <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec</p>
-            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.334465223783!2d-99.03058862413554!3d19.52737668176949!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f0088924151b%3A0xe5c750b38c22789!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714100000000!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe></div>
+            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="https://maps.google.com/maps?q=Multiplaza%20Aragon,%20Ecatepec&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe></div>
         </section>`;
     await window.cargarMenuPrevio();
 };
@@ -189,16 +178,14 @@ window.renderReservaCliente = async () => {
         <div class="modal fade" id="modalTicket" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-white text-dark p-0 border-0 shadow-lg">
-                    <div id="ticket-descarga" style="padding: 40px 30px; background: white; text-align: center; font-family: 'Segoe UI', sans-serif;">
-                        <h5 class="fw-bold mb-4" style="color: #c5a059;">El Oráculo del Sabor</h5>
-                        <div style="border: 1px solid #ddd; border-radius: 10px; padding: 20px;">
+                    <div id="ticket-descarga" style="padding: 40px 30px; background: white; text-align: center;">
+                        <div class="text-center">
                             <h4 class="fw-bold mb-3" style="color: black;">TICKET DE RESERVA</h4>
                             <hr style="border-top: 1px solid #999; opacity: 1;">
                             <div id="ticket-info"></div>
                             <hr style="border-top: 1px solid #999; opacity: 1;">
                             <h6 class="fw-bold mt-3" style="color: #dc3545;">¡TOMA CAPTURA DE PANTALLA!</h6>
                         </div>
-                        <p class="small mt-4 mb-0 text-muted">© 2026 El Oráculo del Sabor - Ecatepec, MX</p>
                     </div>
                     <div class="p-3 bg-light d-flex gap-2">
                         <button class="btn btn-primary w-100" onclick="window.descargarTicket()">DESCARGAR PDF</button>
