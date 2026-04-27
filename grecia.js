@@ -47,7 +47,7 @@ window.renderLanding = async () => {
         <section class="hero-section text-center text-white d-flex align-items-center justify-content-center" style="min-height: 80vh;">
             <div>
                 <h1 class="display-3 fw-bold">El Oráculo <span class="text-gold">del Sabor</span></h1>
-                <p class="lead">Tradición Griega en Ecatepec</p>
+                <p class="lead">Tradición Griega en Multiplaza Aragón</p>
                 <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
                     <button class="btn btn-primary btn-lg px-5" onclick="window.showAuth()">RESERVAR MESA</button>
                     <button class="btn btn-outline-gold btn-lg px-5" onclick="window.verificarPersonal()">ACCESO PERSONAL</button>
@@ -73,10 +73,10 @@ window.renderLanding = async () => {
 
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4 text-gold">Ubicación</h2>
-            <p class="text-white-50">Encuéntranos en el corazón de Ecatepec</p>
+            <p class="text-white-50">Visítanos en Multiplaza Aragón, Ecatepec</p>
             <div class="glass-card p-0 overflow-hidden" style="height: 400px;">
                 <iframe width="100%" height="100%" style="border:0;" 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15040.673436035272!2d-99.0416954!3d19.534241!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f00690022359%3A0x633d7b41943c7b20!2sEcatepec%20de%20Morelos%2C%20M%C3%A9x.!5e0!3m2!1ses-419!2smx!4v1713834567890!5m2!1ses-419!2smx" 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.334460980516!2d-99.03154842426993!3d19.527376781772643!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3540c1d634283893%3A0xc3b86940866504a4!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses!2smx!4v1714100000000!5m2!1ses!2smx" 
                     allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
