@@ -36,16 +36,12 @@ const ESTILOS_GLOBALES = `
     .btn-outline-gold:hover { background: var(--gold); color: black; }
     .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(197, 160, 89, 0.3); border-radius: 15px; padding: 25px; transition: 0.3s; }
     
-    /* Estilos corregidos para inputs y selects */
     input, select, textarea { 
         background: rgba(10, 17, 24, 0.9) !important; 
         color: white !important; 
         border: 1px solid var(--gold) !important; 
     }
-    select option {
-        background-color: #0a1118 !important;
-        color: white !important;
-    }
+    select option { background-color: #0a1118 !important; color: white !important; }
     
     .historial-item { border-left: 4px solid var(--gold); background: rgba(255,255,255,0.08); margin-bottom: 12px; padding: 15px; }
     .status-confirmada { color: var(--gold); }
@@ -59,6 +55,11 @@ const ESTILOS_GLOBALES = `
     @media print { .no-print { display: none !important; } }
 </style>`;
 
+window.scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+};
+
 window.renderLanding = async () => {
     document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
         <section id="inicio" class="hero-section text-center">
@@ -71,10 +72,37 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
-        <section id="menu-section" class="container py-5"><h2 class="text-center mb-5 text-gold display-4">Nuestro Menú</h2><div id="menu-previo" class="row g-4"></div></section>
+
+        <section id="menu-section" class="container py-5">
+            <h2 class="text-center mb-5 text-gold display-4">Nuestro Menú</h2>
+            <div id="menu-previo" class="row g-4"></div>
+        </section>
+
+        <section id="promos-section" class="container py-5">
+            <h2 class="text-center mb-5 text-gold display-4">Promociones del Olimpo</h2>
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="glass-card">
+                        <h3 class="text-gold">2x1 en Gyros</h3>
+                        <p>Todos los jueves en Multiplaza Aragón. ¡No te lo pierdas!</p>
+                        <span class="badge bg-primary">Jueves Heroicos</span>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="glass-card">
+                        <h3 class="text-gold">Postre Gratis</h3>
+                        <p>En tu primera reservación en línea, el Baklava va por nuestra cuenta.</p>
+                        <span class="badge bg-primary">Exclusivo Web</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="ubicacion-section" class="container py-5 text-center">
             <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec</p>
-            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.33923363065!2d-99.0336214!3d19.5273766!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb1b60621379%3A0x643685e13b8e5c8a!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713456789123!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe></div>
+            <div class="glass-card p-0 overflow-hidden" style="height: 400px;">
+                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.123!2d-99.029!3d19.534!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f00000000000%3A0x0!2zMTnCsDMyJzAyLjQiTiA5OcKwMDEnNDQuNCJX!5e0!3m2!1ses!2smx!4v1" allowfullscreen="" loading="lazy"></iframe>
+            </div>
         </section>`;
     await window.cargarMenuPrevio();
 };
@@ -136,7 +164,10 @@ window.renderReservaCliente = async () => {
                 <div class="col-lg-7">
                     <div class="glass-card text-center">
                         <h2 class="mb-4 text-gold">Reserva tu Mesa</h2>
-                        <div class="row mb-3"><div class="col-md-6"><input id="res-f" type="date" class="form-control" min="${new Date().toISOString().split('T')[0]}"></div><div class="col-md-6"><select id="res-h" class="form-select"><option value="" disabled selected>Elegir hora</option><option>14:00</option><option>17:00</option><option>20:00</option></select></div></div>
+                        <div class="row mb-3">
+                            <div class="col-md-6"><input id="res-f" type="date" class="form-control" min="${new Date().toISOString().split('T')[0]}"></div>
+                            <div class="col-md-6"><select id="res-h" class="form-select"><option value="" disabled selected>Elegir hora</option><option>14:00</option><option>17:00</option><option>20:00</option></select></div>
+                        </div>
                         <input id="res-p" type="number" class="form-control mb-4" placeholder="Personas" value="2">
                         <div id="grid-reserva" class="grid-mesas mb-4"></div>
                         <button id="btn-confirmar-res" class="btn btn-primary w-100 d-none" onclick="window.saveReserva()">CONFIRMAR RESERVA</button>
