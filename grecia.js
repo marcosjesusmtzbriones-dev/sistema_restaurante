@@ -2,6 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
+// Librería para PDF
 const scriptPdf = document.createElement('script');
 scriptPdf.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
 document.head.appendChild(scriptPdf);
@@ -31,7 +32,7 @@ const ESTILOS_GLOBALES = `
     .hero-section {
         background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
                     url('https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=2000&auto=format&fit=crop');
-        background-size: cover; background-position: center; height: 100vh; display: flex; align-items: center; justify-content: center; color: white;
+        background-size: cover; background-position: center; height: 90vh; display: flex; align-items: center; justify-content: center; color: white;
     }
     .text-gold { color: var(--gold) !important; }
     .btn-primary { background-color: var(--gold); border: none; color: black; font-weight: bold; }
@@ -39,21 +40,42 @@ const ESTILOS_GLOBALES = `
     .btn-outline-gold { border: 2px solid var(--gold); color: var(--gold); background: transparent; }
     .btn-outline-gold:hover { background: var(--gold); color: black; }
     .glass-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border: 1px solid rgba(197, 160, 89, 0.3); border-radius: 15px; padding: 25px; transition: 0.3s; }
-    input, select, textarea { background: rgba(10, 17, 24, 0.9) !important; color: white !important; border: 1px solid var(--gold) !important; }
+    
+    input, select, textarea { 
+        background: rgba(10, 17, 24, 0.9) !important; 
+        color: white !important; 
+        border: 1px solid var(--gold) !important; 
+    }
+    select option { background-color: #0a1118 !important; color: white !important; }
+    
     .historial-item { border-left: 4px solid var(--gold); background: rgba(255,255,255,0.08); margin-bottom: 12px; padding: 15px; }
     .status-confirmada { color: var(--gold); }
     .status-vencida { color: #ff6b6b; }
+    .status-finalizada { color: #51cf66; }
     .grid-mesas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
     .m-btn { aspect-ratio: 1; border: 1px solid var(--gold); color: white; transition: 0.3s; }
     .m-btn.ocupada { background: #ff6b6b; border: none; opacity: 0.6; }
     .m-btn.seleccionada { background: var(--gold); color: black; }
     .m-btn.atendida { background: #51cf66; border: none; }
-    #ticket-descarga { padding: 40px; background: white; color: black; font-family: 'Segoe UI', sans-serif; }
+    
+    #ticket-descarga { padding: 30px; background: white; color: black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    @media print { .no-print { display: none !important; } }
 </style>`;
+
+window.scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+};
 
 window.descargarTicket = () => {
     const elemento = document.getElementById('ticket-descarga');
-    const opt = { margin: 0.5, filename: 'Ticket-Reserva-Oraculo.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 3 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
+    const opt = {
+        margin: 0.5,
+        filename: 'Ticket-Reserva-Oraculo.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 3 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
     html2pdf().set(opt).from(elemento).save();
 };
 
@@ -78,10 +100,8 @@ window.renderLanding = async () => {
             </div>
         </section>
         <section id="ubicacion-section" class="container py-5 text-center">
-            <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec de Morelos</p>
-            <div class="glass-card p-0 overflow-hidden" style="height: 450px;">
-                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.1032338576425!2d-99.03264662586708!3d19.537213236768372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f0060938f0d9%3A0xc3163e792e3a0937!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714175314056!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe>
-            </div>
+            <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec</p>
+            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="http://googleusercontent.com/maps.google.com/7" allowfullscreen="" loading="lazy"></iframe></div>
         </section>`;
     await window.cargarMenuPrevio();
 };
@@ -92,7 +112,7 @@ window.cargarMenuPrevio = async () => {
     if(!container) return; container.innerHTML = "";
     snap.forEach(doc => {
         const p = doc.data();
-        container.innerHTML += `<div class="col-md-4"><div class="glass-card text-center h-100"><img src="${p.imagen}" onerror="this.src='https://placehold.co/400x300/0a1118/c5a059?text=Menu'" class="img-fluid rounded mb-3" style="height:200px; width:100%; object-fit:cover;"><h4 class="text-gold">${p.nombre}</h4><p class="small text-white-50"><i>${p.descripcion}</i></p><h5 class="fw-bold">$${p.precio}</h5></div></div>`;
+        container.innerHTML += `<div class="col-md-4"><div class="glass-card text-center h-100"><img src="${p.imagen}" onerror="this.src='https://placehold.co/400x300'" class="img-fluid rounded mb-3" style="height:200px; width:100%; object-fit:cover;"><h4 class="text-gold">${p.nombre}</h4><p class="small text-white-50"><i>${p.descripcion}</i></p><h5 class="fw-bold">$${p.precio}</h5></div></div>`;
     });
 };
 
@@ -145,7 +165,7 @@ window.renderReservaCliente = async () => {
                         <h2 class="mb-4 text-gold">Reserva tu Mesa</h2>
                         <div class="row mb-3">
                             <div class="col-md-6"><input id="res-f" type="date" class="form-control" min="${new Date().toISOString().split('T')[0]}"></div>
-                            <div class="col-md-6"><select id="res-h" class="form-select"><option value="" disabled selected>Hora</option><option>14:00</option><option>17:00</option><option>20:00</option></select></div>
+                            <div class="col-md-6"><select id="res-h" class="form-select"><option value="" disabled selected>Elegir hora</option><option>14:00</option><option>17:00</option><option>20:00</option></select></div>
                         </div>
                         <input id="res-p" type="number" class="form-control mb-4" placeholder="Personas" value="2">
                         <div id="grid-reserva" class="grid-mesas mb-4"></div>
@@ -194,23 +214,9 @@ window.renderReservaCliente = async () => {
         if(!container) return; container.innerHTML = "";
         snap.forEach(d => {
             const r = d.data();
-            container.innerHTML += `
-                <div class="historial-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div><b>Mesa ${r.mesa}-${r.fecha} | ${r.hora}</b><br><small>${r.personas} Personas</small></div>
-                        <span class="status-${r.estado}">${r.estado}</span>
-                    </div>
-                    ${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${d.id}', '${r.mesa}')">Cancelar Reserva</button>` : ""}
-                </div>`;
+            container.innerHTML += `<div class="historial-item"><div class="d-flex justify-content-between"><div><b>Mesa ${r.mesa}-${r.fecha} | ${r.hora}</b><br><small>${r.personas} personas</small></div><span class="status-${r.estado}">${r.estado}</span></div>${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${d.id}', '${r.mesa}')">Cancelar</button>` : ""}</div>`;
         });
     });
-};
-
-window.cancelarReserva = async (idH, idM) => {
-    if(confirm("¿Seguro que deseas cancelar esta reserva?")) {
-        await updateDoc(doc(db, "historial_reservas", idH), { estado: "vencida" });
-        await deleteDoc(doc(db, "mesas_activas", idM));
-    }
 };
 
 window.saveReserva = async () => {
@@ -221,8 +227,20 @@ window.saveReserva = async () => {
     const data = { cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, mesa: mesaActiva, estado: "confirmada", productos: [], total: 0 };
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), data);
     await addDoc(collection(db, "historial_reservas"), data);
-    document.getElementById('ticket-info').innerHTML = `<h2 class="fw-bold">Mesa ${mesaActiva}</h2><h4 class="mb-1">${f} - ${h}</h4><h5 class="fw-bold">${p} Personas</h5>`;
+    
+    document.getElementById('ticket-info').innerHTML = `
+        <h2 class="fw-bold">Mesa ${mesaActiva}</h2>
+        <h4 class="mb-1">${f} - ${h}</h4>
+        <h5 class="fw-bold">${p} Personas</h5>
+    `;
     new bootstrap.Modal('#modalTicket').show();
+};
+
+window.cancelarReserva = async (idH, idM) => {
+    if(confirm("¿Cancelar reservación?")) {
+        await updateDoc(doc(db, "historial_reservas", idH), { estado: "vencida" });
+        await deleteDoc(doc(db, "mesas_activas", idM));
+    }
 };
 
 window.renderGerente = () => {
@@ -263,7 +281,7 @@ window.cargarHistorialVentas = async () => {
 };
 
 window.renderMesero = () => {
-    document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
+    document.getElementById('main-content').innerHTML = `
         <div class="container my-5"><h2 class="text-center mb-4 text-gold">Terminal de Atención</h2>
             <div class="row">
                 <div class="col-md-4"><div class="glass-card"><h4>Mesas</h4><div id="grid-mesas-m" class="grid-mesas"></div></div></div>
@@ -335,7 +353,15 @@ window.generarTicketFinal = async () => {
     const snapM = await getDoc(doc(db, "mesas_activas", mesaActiva.toString()));
     const dataM = snapM.data();
     await addDoc(collection(db, "ventas_finalizadas"), { ...dataM, mesa: mesaActiva, total: parseInt(total), fecha_venta: new Date().toLocaleString(), mesero_nombre: nombreUsuarioActual });
-    document.getElementById('main-content').innerHTML = `<div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg text-center" style="max-width: 350px; font-family: monospace;"><h4>EL ORÁCULO DEL SABOR</h4><hr><p>Mesa: ${mesaActiva}<br>Comensales: ${dataM.personas}<br>Atendió: ${nombreUsuarioActual}</p><hr><div id="items-ticket"></div><hr><h5>TOTAL: $${total}</h5><hr><button class="btn btn-dark w-100 no-print" onclick="window.finalizarCobro()">PAGADO</button></div>`;
+    
+    document.getElementById('main-content').innerHTML = `
+        <div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg text-center" style="max-width: 350px; font-family: monospace;">
+            <h4>EL ORÁCULO DEL SABOR</h4><hr>
+            <p>Mesa: ${mesaActiva}<br>Comensales: ${dataM.personas}<br>Atendió: ${nombreUsuarioActual}</p><hr>
+            <div id="items-ticket"></div><hr>
+            <h5>TOTAL: $${total}</h5><hr>
+            <button class="btn btn-dark w-100 no-print" onclick="window.finalizarCobro()">PAGADO</button>
+        </div>`;
     pedidoLocal.forEach(p => { document.getElementById('items-ticket').innerHTML += `<div class="d-flex justify-content-between"><span>${p.cantidad} ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
 };
 
