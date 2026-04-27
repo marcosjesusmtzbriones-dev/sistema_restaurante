@@ -80,6 +80,16 @@ window.renderLanding = async () => {
             </div>
             <div id="menu-previo" class="row g-4"></div>
         </section>
+        <section id="promos-section" class="py-5 bg-greek-dark">
+            <div class="container text-center">
+                <h2 class="mb-5 text-gold">Promociones del Olimpo</h2>
+                <div class="row g-4">
+                    <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>2x1</h3><h4>Gyros</h4><p>Martes y Jueves</p></div></div>
+                    <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>15%</h3><h4>Estudiantes</h4><p>Credencial vigente</p></div></div>
+                    <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>FREE</h3><h4>Baklava</h4><p>En tu primera reserva</p></div></div>
+                </div>
+            </div>
+        </section>
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4 text-gold">Ubicación</h2>
             <p class="text-white-50">Multiplaza Aragón, Ecatepec</p>
