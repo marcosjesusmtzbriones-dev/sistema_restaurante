@@ -101,7 +101,7 @@ window.renderLanding = async () => {
         </section>
         <section id="ubicacion-section" class="container py-5 text-center">
             <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec</p>
-            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="http://googleusercontent.com/maps.google.com/7" allowfullscreen="" loading="lazy"></iframe></div>
+            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="https://maps.google.com/maps?q=Multiplaza%20Aragon,%20Ecatepec&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe></div>
         </section>`;
     await window.cargarMenuPrevio();
 };
@@ -177,14 +177,14 @@ window.renderReservaCliente = async () => {
         </div>
         <div class="modal fade" id="modalTicket" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-white text-dark p-0">
-                    <div id="ticket-descarga">
+                <div class="modal-content bg-white text-dark p-0 border-0 shadow-lg">
+                    <div id="ticket-descarga" style="padding: 40px 30px; background: white; text-align: center;">
                         <div class="text-center">
-                            <h5 class="fw-bold mb-1">El Oráculo del Sabor</h5>
-                            <h3 class="fw-bold mb-3">TICKET DE RESERVA</h3>
+                            <h4 class="fw-bold mb-3" style="color: black;">TICKET DE RESERVA</h4>
+                            <hr style="border-top: 1px solid #999; opacity: 1;">
                             <div id="ticket-info"></div>
-                            <h6 class="fw-bold mt-4" style="color: #d9534f;">¡TOMA CAPTURA DE PANTALLA!</h6>
-                            <p class="small mt-4 mb-0 text-muted">2026 El Oráculo del Sabor - Ecatepec, MX</p>
+                            <hr style="border-top: 1px solid #999; opacity: 1;">
+                            <h6 class="fw-bold mt-3" style="color: #dc3545;">¡TOMA CAPTURA DE PANTALLA!</h6>
                         </div>
                     </div>
                     <div class="p-3 bg-light d-flex gap-2">
@@ -229,9 +229,9 @@ window.saveReserva = async () => {
     await addDoc(collection(db, "historial_reservas"), data);
     
     document.getElementById('ticket-info').innerHTML = `
-        <h2 class="fw-bold">Mesa ${mesaActiva}</h2>
-        <h4 class="mb-1">${f} - ${h}</h4>
-        <h5 class="fw-bold">${p} Personas</h5>
+        <h3 class="fw-bold mt-3 mb-2" style="color: black;">Mesa ${mesaActiva}</h3>
+        <p class="mb-2" style="color: black; font-size: 16px;">${f} - ${h}</p>
+        <p class="mb-3" style="color: black; font-size: 15px;">${p} Personas</p>
     `;
     new bootstrap.Modal('#modalTicket').show();
 };
