@@ -19,18 +19,20 @@ let mesaActiva = null;
 let pedidoLocal = [];
 let prodTemp = null;
 let cantTemp = 1;
+let nombreUsuarioActual = ""; // Variable para guardar el nombre real
 
 const ESTILOS_GLOBALES = `
 <style>
     select, input { background-color: rgba(255,255,255,0.1) !important; color: white !important; border: 1px solid #c5a059 !important; }
     select option { background: #121212; color: white; }
-    .historial-item { border-left: 4px solid #c5a059; background: rgba(255,255,255,0.05); margin-bottom: 10px; padding: 10px; border-radius: 0 8px 8px 0; }
-    .status-vencida { color: #ff4444; font-size: 0.8rem; }
-    .status-finalizada { color: #00ff88; font-size: 0.8rem; }
-    .status-pendiente { color: #c5a059; font-size: 0.8rem; }
+    .historial-item { border-left: 4px solid #c5a059; background: rgba(255,255,255,0.05); margin-bottom: 10px; padding: 15px; border-radius: 0 8px 8px 0; transition: 0.3s; }
+    .status-vencida { color: #ff4444; font-weight: bold; }
+    .status-finalizada { color: #00ff88; font-weight: bold; }
+    .status-confirmada { color: #c5a059; font-weight: bold; }
     @media print { .no-print { display: none !important; } }
 </style>`;
 
+// --- NAVEGACIÓN ---
 window.scrollToSection = (id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -109,14 +111,14 @@ window.showAuth = (esPersonal = false) => {
 window.handleLogin = async () => {
     const e = document.getElementById('auth-e').value;
     const p = document.getElementById('auth-p').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Credenciales incorrectas"); }
+    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Error de acceso"); }
 };
 
 window.showRegister = () => {
     document.getElementById('auth-box').innerHTML = `
         <h3 class="text-center mb-4" style="color:#c5a059">Registro</h3>
         <input id="reg-n" class="form-control mb-2" placeholder="Nombre Completo">
-        <input id="reg-e" class="form-control mb-2" placeholder="Correo Electrónico">
+        <input id="reg-e" class="form-control mb-2" placeholder="Correo">
         <input id="reg-p" type="password" class="form-control mb-3" placeholder="Contraseña">
         <button onclick="window.handleRegister()" class="btn btn-primary w-100">Registrarme</button>`;
 };
@@ -131,46 +133,36 @@ window.handleRegister = async () => {
     } catch (err) { alert(err.message); }
 };
 
+// --- PANEL CLIENTE ---
 window.renderReservaCliente = async () => {
     document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
         <div class="container my-5">
             <div class="row g-4">
                 <div class="col-lg-7">
                     <div class="glass-card text-center">
-                        <h2 class="mb-4" style="color:#c5a059">Nueva Reservación</h2>
+                        <h2 class="mb-4" style="color:#c5a059">Reservar Mesa</h2>
                         <div class="row text-start">
-                            <div class="col-md-6 mb-3">
-                                <label class="small text-white-50">Fecha:</label>
-                                <input id="res-f" type="date" class="form-control" min="${new Date().toISOString().split('T')[0]}">
-                            </div>
-                            <div class="col-md-6 mb-3">
-                                <label class="small text-white-50">Hora:</label>
-                                <select id="res-h" class="form-select">
-                                    <option value="14:00">14:00 PM</option><option value="17:00">17:00 PM</option><option value="20:00">20:00 PM</option>
-                                </select>
-                            </div>
-                            <div class="col-12 mb-4">
-                                <label class="small text-white-50">Personas:</label>
-                                <input id="res-p" type="number" class="form-control" min="1" value="2">
-                            </div>
+                            <div class="col-md-6 mb-3"><label class="small text-white-50">Fecha:</label><input id="res-f" type="date" class="form-control" min="${new Date().toISOString().split('T')[0]}"></div>
+                            <div class="col-md-6 mb-3"><label class="small text-white-50">Hora:</label><select id="res-h" class="form-select"><option>14:00</option><option>17:00</option><option>20:00</option></select></div>
+                            <div class="col-12 mb-4"><label class="small text-white-50">Personas:</label><input id="res-p" type="number" class="form-control" value="2" min="1"></div>
                         </div>
                         <div id="grid-reserva" class="grid-mesas mb-4"></div>
-                        <button id="btn-confirmar-res" class="btn btn-primary w-100 d-none" onclick="window.saveReserva()">CONFIRMAR RESERVACIÓN</button>
+                        <button id="btn-confirmar-res" class="btn btn-primary w-100 d-none" onclick="window.saveReserva()">CONFIRMAR RESERVA</button>
                     </div>
                 </div>
                 <div class="col-lg-5">
                     <div class="glass-card">
-                        <h4 style="color:#c5a059" class="mb-3">Mi Historial de Reservas</h4>
+                        <h4 style="color:#c5a059" class="mb-3">Mi Historial</h4>
                         <div id="lista-historial"></div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="modal fade" id="modalTicket" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-white text-dark"><div class="modal-body text-center" id="ticket-area">
-            <h4 class="fw-bold">RESERVACIÓN EXITOSA</h4><hr>
+        <div class="modal fade" id="modalTicket" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-white text-dark"><div class="modal-body text-center">
+            <h4 class="fw-bold">RESERVACIÓN CONFIRMADA</h4><hr>
             <div id="ticket-info"></div><hr>
-            <p class="text-danger fw-bold small">¡TOMA CAPTURA DE PANTALLA DE TU TICKET!</p>
-            <button class="btn btn-dark w-100 no-print" onclick="window.print()">IMPRIMIR / GUARDAR</button>
+            <p class="text-danger fw-bold small">¡TOMA CAPTURA DE PANTALLA!</p>
+            <button class="btn btn-dark w-100 no-print" onclick="window.print()">IMPRIMIR</button>
         </div></div></div></div>`;
 
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
@@ -181,34 +173,23 @@ window.renderReservaCliente = async () => {
             const btn = document.createElement('button');
             btn.className = `btn m-btn ${ocupadas[i] ? 'ocupada' : ''} ${mesaActiva == i ? 'seleccionada' : ''}`;
             btn.innerText = `M${i}`; btn.disabled = ocupadas[i];
-            btn.onclick = () => { 
-                mesaActiva = i; 
-                document.querySelectorAll('.m-btn').forEach(b => b.classList.remove('seleccionada')); 
-                btn.classList.add('seleccionada'); 
-                document.getElementById('btn-confirmar-res').classList.remove('d-none'); 
-            };
+            btn.onclick = () => { mesaActiva = i; document.querySelectorAll('.m-btn').forEach(b => b.classList.remove('seleccionada')); btn.classList.add('seleccionada'); document.getElementById('btn-confirmar-res').classList.remove('d-none'); };
             grid.appendChild(btn);
         }
     });
 
-    const q = query(collection(db, "historial_reservas"), where("cliente", "==", auth.currentUser.email));
+    const q = query(collection(db, "historial_reservas"), where("cliente", "==", auth.currentUser.email), orderBy("fecha", "desc"));
     onSnapshot(q, (snap) => {
         const container = document.getElementById('lista-historial');
         if(!container) return; container.innerHTML = "";
-        if(snap.empty) container.innerHTML = "<p class='text-white-50 small'>No tienes movimientos.</p>";
         snap.forEach(d => {
             const r = d.data();
-            const idDoc = d.id;
-            let btnCancelar = (r.estado === "confirmada") ? `<button class="btn btn-sm btn-outline-danger mt-2" onclick="window.cancelarReserva('${idDoc}', '${r.mesa}')">Cancelar</button>` : "";
-            let colorClase = r.estado === "vencida" ? "status-vencida" : (r.estado === "finalizada" ? "status-finalizada" : "status-pendiente");
-            
+            const idH = d.id;
+            let statusClass = `status-${r.estado}`;
+            let btnCancel = r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger mt-2" onclick="window.cancelarReserva('${idH}', '${r.mesa}')">Cancelar</button>` : "";
             container.innerHTML += `<div class="historial-item">
-                <div class="d-flex justify-content-between">
-                    <b>Mesa ${r.mesa}</b>
-                    <span class="${colorClase}">${r.estado.toUpperCase()}</span>
-                </div>
-                <small class="text-white-50">${r.fecha} | ${r.hora} | ${r.personas} pers.</small><br>
-                ${btnCancelar}
+                <div class="d-flex justify-content-between"><b>Mesa ${r.mesa}</b> <span class="${statusClass}">${r.estado.toUpperCase()}</span></div>
+                <small>${r.fecha} | ${r.hora} | ${r.personas} pers.</small><br>${btnCancel}
             </div>`;
         });
     });
@@ -222,44 +203,40 @@ window.saveReserva = async () => {
     const data = { cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, mesa: mesaActiva, estado: "confirmada", productos: [], total: 0 };
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), data);
     await addDoc(collection(db, "historial_reservas"), data);
-    document.getElementById('ticket-info').innerHTML = `<h3>MESA ${mesaActiva}</h3><p>${f} - ${h}</p><p>${p} Comensales</p><p class="small">Cliente: ${auth.currentUser.email}</p>`;
+    document.getElementById('ticket-info').innerHTML = `<h3>MESA ${mesaActiva}</h3><p>${f} - ${h}</p><p>${p} Personas</p>`;
     new bootstrap.Modal('#modalTicket').show();
-    mesaActiva = null;
 };
 
-window.cancelarReserva = async (idHistorial, idMesa) => {
-    if(confirm("¿Seguro que deseas cancelar tu reserva?")) {
-        await updateDoc(doc(db, "historial_reservas", idHistorial), { estado: "vencida" });
-        await deleteDoc(doc(db, "mesas_activas", idMesa));
-        alert("Reserva cancelada.");
+window.cancelarReserva = async (idH, idM) => {
+    if(confirm("¿Cancelar reserva?")) {
+        await updateDoc(doc(db, "historial_reservas", idH), { estado: "vencida" });
+        await deleteDoc(doc(db, "mesas_activas", idM));
     }
 };
 
+// --- PANEL GERENTE ---
 window.renderGerente = async () => {
     document.getElementById('main-content').innerHTML = `
         <div class="container my-5">
-            <h2 class="mb-4" style="color:#c5a059">Panel de Control Gerencial</h2>
+            <h2 style="color:#c5a059" class="mb-4">Panel Gerencial</h2>
             <div class="row g-4 mb-5">
                 <div class="col-md-4"><div class="glass-card text-center"><h5>Ventas Totales</h5><h2 id="total-ventas" class="text-gold">$0</h2></div></div>
-                <div class="col-md-8"><div class="glass-card"><h5>Historial de Ventas y Meseros</h5><div id="reporte-ventas" style="max-height:300px; overflow-y:auto;"></div></div></div>
+                <div class="col-md-8"><div class="glass-card"><h5>Reporte de Ventas</h5><div id="reporte-ventas" style="max-height:300px; overflow-y:auto;"></div></div></div>
             </div>
             <div class="row g-4">
-                <div class="col-md-6"><div class="glass-card"><h4>Registrar Mesero</h4><input id="m-nom" class="form-control mb-2" placeholder="Nombre"><input id="m-ema" class="form-control mb-2" placeholder="Correo"><input id="m-pas" type="password" class="form-control mb-3" placeholder="Contraseña"><button onclick="window.registrarMesero()" class="btn btn-primary w-100">DAR DE ALTA</button></div></div>
-                <div class="col-md-6"><div class="glass-card"><h4>Nuevo Platillo al Menú</h4><input id="p-nom" class="form-control mb-2" placeholder="Nombre"><input id="p-pre" type="number" class="form-control mb-2" placeholder="Precio"><input id="p-img" class="form-control mb-3" placeholder="URL Imagen"><button onclick="window.agregarPlatillo()" class="btn btn-primary w-100">AGREGAR AL SISTEMA</button></div></div>
+                <div class="col-md-6"><div class="glass-card"><h4>Registrar Mesero</h4><input id="m-nom" class="form-control mb-2" placeholder="Nombre"><input id="m-ema" class="form-control mb-2" placeholder="Correo"><input id="m-pas" type="password" class="form-control mb-3" placeholder="Contraseña"><button onclick="window.registrarMesero()" class="btn btn-primary w-100">REGISTRAR</button></div></div>
+                <div class="col-md-6"><div class="glass-card"><h4>Añadir al Menú</h4><input id="p-nom" class="form-control mb-2" placeholder="Nombre"><input id="p-pre" type="number" class="form-control mb-2" placeholder="Precio"><input id="p-img" class="form-control mb-3" placeholder="URL Imagen"><button onclick="window.agregarPlatillo()" class="btn btn-primary w-100">GUARDAR</button></div></div>
             </div>
         </div>`;
     
     const snap = await getDocs(collection(db, "ventas_finalizadas"));
-    let sum = 0;
+    let total = 0;
     const container = document.getElementById('reporte-ventas');
     snap.forEach(d => {
-        const v = d.data(); sum += v.total;
-        container.innerHTML += `<div class="border-bottom border-secondary py-2 small">
-            <b>Mesa ${v.mesa}</b> - <span class="text-gold">$${v.total}</span><br>
-            Atendió: ${v.mesero_asignado} | Fecha: ${v.fecha_venta}
-        </div>`;
+        const v = d.data(); total += v.total;
+        container.innerHTML += `<div class="border-bottom border-secondary py-2 small"><b>Mesa ${v.mesa}</b> - $${v.total} | Mesero: ${v.mesero_nombre}<br><span class="text-white-50">${v.fecha_venta}</span></div>`;
     });
-    document.getElementById('total-ventas').innerText = `$${sum}`;
+    document.getElementById('total-ventas').innerText = `$${total}`;
 };
 
 window.registrarMesero = async () => {
@@ -270,7 +247,7 @@ window.registrarMesero = async () => {
         const tApp = initializeApp(firebaseConfig, "temp");
         const res = await createUserWithEmailAndPassword(getAuth(tApp), e, p);
         await setDoc(doc(db, "usuarios", res.user.uid), { nombre: n, correo: e, rol: "mesero" });
-        alert("Mesero registrado con éxito");
+        alert("Mesero registrado");
     } catch (err) { alert(err.message); }
 };
 
@@ -282,48 +259,41 @@ window.agregarPlatillo = async () => {
     alert("Menú actualizado");
 };
 
+// --- PANEL MESERO ---
 window.renderMesero = () => {
     document.getElementById('main-content').innerHTML = `
         <div class="container my-5">
             <h2 class="text-center mb-4" style="color:#c5a059">Atención de Mesas</h2>
             <div class="row">
-                <div class="col-md-4"><div class="glass-card"><h4>Mapa de Mesas</h4><div id="grid-mesas-m" class="grid-mesas"></div></div></div>
+                <div class="col-md-4"><div class="glass-card"><h4>Mesas</h4><div id="grid-mesas-m" class="grid-mesas"></div></div></div>
                 <div id="area-atencion" class="col-md-8 d-none">
                     <div class="glass-card">
                         <h3 class="text-center">Mesa: <span id="m-atend" style="color:#c5a059">--</span></h3>
-                        <p class="text-center text-white-50 mb-4">Comensales: <span id="m-pers-atend">0</span></p>
-                        <select id="select-platillo" class="form-select mb-3" onchange="window.abrirModalCantidad(this.value)">
-                            <option value="" selected disabled>Añadir producto...</option>
-                        </select>
+                        <p class="text-center text-white-50">Comensales: <span id="m-pers-atend">0</span></p>
+                        <select id="select-platillo" class="form-select mb-3" onchange="window.abrirModalCantidad(this.value)"><option value="" selected disabled>Seleccionar platillo...</option></select>
                         <div id="lista-pedido" class="mb-4"></div>
-                        <div class="d-flex justify-content-between text-gold"><h4>Total a Cobrar:</h4><h4>$<span id="total-atencion">0</span></h4></div>
-                        <button class="btn btn-primary w-100" onclick="window.generarTicketFinal()">CERRAR MESA Y GENERAR TICKET</button>
+                        <h4 class="text-end text-gold">Total: $<span id="total-atencion">0</span></h4>
+                        <button class="btn btn-primary w-100" onclick="window.generarTicketFinal()">GENERAR TICKET</button>
                     </div>
                 </div>
             </div>
         </div>
         <div class="modal fade" id="modalCantidad" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-dark text-white border-gold"><div class="modal-body text-center">
-            <h5 id="p-nombre-modal" class="mb-4 text-gold"></h5>
+            <h5 id="p-nombre-modal" class="text-gold mb-4"></h5>
             <div class="d-flex justify-content-center align-items-center gap-4 mb-4">
                 <button class="btn btn-outline-gold" onclick="window.modCant(-1)">-</button>
                 <h2 id="p-cant-modal">1</h2>
                 <button class="btn btn-outline-gold" onclick="window.modCant(1)">+</button>
             </div>
-            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AGREGAR AL PEDIDO</button>
+            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AÑADIR</button>
         </div></div></div></div>`;
     
-    const cargarOpts = async () => {
+    const cargarMenu = async () => {
         const snap = await getDocs(collection(db, "menu"));
         const sel = document.getElementById('select-platillo');
-        snap.forEach(d => {
-            const p = d.data();
-            const opt = document.createElement('option');
-            opt.value = JSON.stringify({nombre: p.nombre, precio: p.precio});
-            opt.innerText = `${p.nombre} - $${p.precio}`;
-            sel.appendChild(opt);
-        });
+        snap.forEach(d => { const p = d.data(); const opt = document.createElement('option'); opt.value = JSON.stringify({nombre: p.nombre, precio: p.precio}); opt.innerText = `${p.nombre} - $${p.precio}`; sel.appendChild(opt); });
     };
-    cargarOpts();
+    cargarMenu();
 
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
         const grid = document.getElementById('grid-mesas-m');
@@ -342,9 +312,9 @@ window.renderMesero = () => {
 window.atenderMesa = async (id, data) => {
     mesaActiva = id;
     if(!data) {
-        const pers = prompt(`Abrir Mesa ${id} presencial. ¿Cuántas personas?`, "2");
+        const pers = prompt(`Comensales Mesa ${id}:`, "2");
         if(!pers) return;
-        data = { cliente: "Presencial", mesero_asignado: auth.currentUser.email, personas: pers, productos: [], total: 0 };
+        data = { cliente: "Presencial", mesero_asignado: auth.currentUser.email, mesero_nombre: nombreUsuarioActual, personas: pers, productos: [], total: 0 };
         await setDoc(doc(db, "mesas_activas", id.toString()), data);
     }
     pedidoLocal = data.productos || [];
@@ -380,24 +350,25 @@ window.renderListaPedido = () => {
 
 window.generarTicketFinal = async () => {
     const total = document.getElementById('total-atencion').innerText;
-    const snap = await getDoc(doc(db, "mesas_activas", mesaActiva.toString()));
-    const data = snap.data();
-    
-    // Marcar en historial como finalizada si era reserva
-    const qH = query(collection(db, "historial_reservas"), where("mesa", "==", mesaActiva), where("estado", "==", "confirmada"));
-    const hSnap = await getDocs(qH);
-    hSnap.forEach(async d => await updateDoc(doc(db, "historial_reservas", d.id), { estado: "finalizada" }));
+    const snapMesa = await getDoc(doc(db, "mesas_activas", mesaActiva.toString()));
+    const dataMesa = snapMesa.data();
 
-    await addDoc(collection(db, "ventas_finalizadas"), { ...data, mesa: mesaActiva, total: parseInt(total), fecha_venta: new Date().toLocaleString() });
-    
+    // Actualizar historial si era reserva
+    const qH = query(collection(db, "historial_reservas"), where("mesa", "==", mesaActiva), where("estado", "==", "confirmada"));
+    const snapH = await getDocs(qH);
+    snapH.forEach(async d => await updateDoc(doc(db, "historial_reservas", d.id), { estado: "finalizada" }));
+
+    // Guardar Venta
+    await addDoc(collection(db, "ventas_finalizadas"), { ...dataMesa, mesa: mesaActiva, total: parseInt(total), fecha_venta: new Date().toLocaleString() });
+
     document.getElementById('main-content').innerHTML = `
         <div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg" style="font-family: monospace; max-width: 350px;">
             <h4 class="text-center fw-bold">EL ORÁCULO DEL SABOR</h4><hr>
-            <p>MESA: ${mesaActiva} | ATENDIÓ: ${auth.currentUser.email}</p><hr>
+            <p>MESA: ${mesaActiva} | MESERO: ${nombreUsuarioActual}</p><hr>
             <div id="items-ticket"></div><hr>
             <h4 class="d-flex justify-content-between"><span>TOTAL:</span> <span>$${total}</span></h4><hr>
-            <p class="text-center text-danger fw-bold">¡TOMA CAPTURA DE TU TICKET DE PAGO!</p>
-            <button class="btn btn-dark w-100 no-print mt-3" onclick="window.finalizarCobro()">PAGO RECIBIDO</button>
+            <p class="text-center text-danger fw-bold">¡TOMA CAPTURA DE TU TICKET!</p>
+            <button class="btn btn-dark w-100 no-print mt-3" onclick="window.finalizarCobro()">PAGADO</button>
         </div>`;
     const container = document.getElementById('items-ticket');
     pedidoLocal.forEach(p => { container.innerHTML += `<div class="d-flex justify-content-between"><span>${p.cantidad} ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
@@ -408,10 +379,12 @@ window.finalizarCobro = async () => {
     window.renderMesero();
 };
 
+// --- ESTADO DE SESIÓN ---
 onAuthStateChanged(auth, async (u) => {
     if(u) {
         const d = await getDoc(doc(db, "usuarios", u.uid));
         const user = d.data();
+        nombreUsuarioActual = user.nombre; // Guardamos el nombre real
         document.getElementById('btn-logout').classList.remove('d-none');
         if(user.rol === 'gerente') window.renderGerente();
         else if(user.rol === 'mesero') window.renderMesero();
