@@ -51,11 +51,6 @@ const ESTILOS_GLOBALES = `
     #ticket-descarga { padding: 40px; background: white; color: black; font-family: 'Segoe UI', sans-serif; }
 </style>`;
 
-window.scrollToSection = (id) => {
-    const el = document.getElementById(id);
-    if (el) el.scrollIntoView({ behavior: 'smooth' });
-};
-
 window.descargarTicket = () => {
     const elemento = document.getElementById('ticket-descarga');
     const opt = { margin: 0.5, filename: 'Ticket-Reserva-Oraculo.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 3 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
@@ -67,12 +62,7 @@ window.renderLanding = async () => {
         <section id="inicio" class="hero-section text-center">
             <div class="container">
                 <h1 class="display-2 fw-bold mb-3">El Oráculo <span class="text-gold">del Sabor</span></h1>
-                <p class="lead mb-4 fs-3">Auténtica Gastronomía Griega en Ecatepec</p>
-                <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
-                    <button class="btn btn-outline-gold" onclick="window.scrollToSection('menu-section')">VER MENÚ</button>
-                    <button class="btn btn-outline-gold" onclick="window.scrollToSection('promos-section')">PROMOS</button>
-                    <button class="btn btn-outline-gold" onclick="window.scrollToSection('ubicacion-section')">UBICACIÓN</button>
-                </div>
+                <p class="lead mb-5 fs-3">Auténtica Gastronomía Griega en Ecatepec</p>
                 <div class="d-flex justify-content-center gap-3">
                     <button class="btn btn-primary btn-lg px-5" onclick="window.showAuth()">RESERVAR AHORA</button>
                     <button class="btn btn-outline-gold btn-lg px-5" onclick="window.verificarPersonal()">ACCESO STAFF</button>
@@ -90,7 +80,7 @@ window.renderLanding = async () => {
         <section id="ubicacion-section" class="container py-5 text-center">
             <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec de Morelos</p>
             <div class="glass-card p-0 overflow-hidden" style="height: 450px;">
-                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3759.123456789!2d-99.027!3d19.534!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDMyJzAyLjQiTiA5OcKwMDEnMzcuMiJX!5e0!3m2!1ses!2smx!4v1234567891" allowfullscreen="" loading="lazy"></iframe>
+                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.1032338576425!2d-99.03264662586708!3d19.537213236768372!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f0060938f0d9%3A0xc3163e792e3a0937!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714175314056!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
     await window.cargarMenuPrevio();
