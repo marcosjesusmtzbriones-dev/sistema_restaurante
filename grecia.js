@@ -24,7 +24,7 @@ let nombreUsuarioActual = "";
 const ESTILOS_GLOBALES = `
 <style>
     :root { --gold: #c5a059; }
-    select, input { background-color: rgba(255,255,255,0.1) !important; color: white !important; border: 1px solid var(--gold) !important; }
+    select, input, textarea { background-color: rgba(255,255,255,0.1) !important; color: white !important; border: 1px solid var(--gold) !important; }
     select option { background: #121212; color: white; }
     .historial-item { border-left: 4px solid var(--gold); background: rgba(255,255,255,0.08); margin-bottom: 12px; padding: 15px; border-radius: 0 8px 8px 0; }
     .status-vencida { color: #ff6b6b; font-weight: bold; }
@@ -32,6 +32,7 @@ const ESTILOS_GLOBALES = `
     .status-confirmada { color: var(--gold); font-weight: bold; }
     .text-gold { color: var(--gold) !important; }
     .card-admin { background: rgba(255,255,255,0.05); border: 1px solid var(--gold); border-radius: 12px; padding: 20px; height: 100%; }
+    .desc-platillo { font-size: 0.85rem; color: #bbb; font-style: italic; margin-top: 5px; }
     @media print { .no-print { display: none !important; } .modal-backdrop { display: none !important; } }
 </style>`;
 
@@ -84,7 +85,16 @@ window.cargarMenuPrevio = async () => {
     if(!container) return; container.innerHTML = "";
     snap.forEach(doc => {
         const p = doc.data();
-        container.innerHTML += `<div class="col-md-4"><div class="glass-card text-center h-100"><img src="${p.imagen}" class="img-fluid rounded mb-3" style="height:180px; width:100%; object-fit:cover;"><h4>${p.nombre}</h4><h5 class="text-gold">$${p.precio}</h5><small class="text-white-50">${p.categoria.replace('_', ' ')}</small></div></div>`;
+        container.innerHTML += `
+            <div class="col-md-4">
+                <div class="glass-card text-center h-100">
+                    <img src="${p.imagen}" class="img-fluid rounded mb-3" style="height:180px; width:100%; object-fit:cover;">
+                    <h4 class="mb-0">${p.nombre}</h4>
+                    <p class="desc-platillo">(${p.descripcion || 'Sin descripción'})</p>
+                    <h5 class="text-gold">$${p.precio}</h5>
+                    <small class="text-white-50">${p.categoria.replace('_', ' ')}</small>
+                </div>
+            </div>`;
     });
 };
 
@@ -212,7 +222,8 @@ window.renderGerente = () => {
                             <option value="postre">Postre</option>
                             <option value="bebida">Bebida</option>
                         </select>
-                        <input id="p-nombre" class="form-control mb-2" placeholder="Nombre del Platillo/Bebida">
+                        <input id="p-nombre" class="form-control mb-2" placeholder="Nombre (Ej: Tzatziki)">
+                        <textarea id="p-desc" class="form-control mb-2" placeholder="Descripción (Ej: Yogur con pepino y ajo)"></textarea>
                         <input id="p-precio" type="number" class="form-control mb-2" placeholder="Precio ($)">
                         <input id="p-img" class="form-control mb-3" placeholder="URL de la Imagen">
                         <button onclick="window.guardarProducto()" class="btn btn-primary w-100">Guardar en Menú</button>
@@ -263,10 +274,11 @@ window.crearMesero = async () => {
 window.guardarProducto = async () => {
     const cat = document.getElementById('p-categoria').value;
     const nom = document.getElementById('p-nombre').value;
+    const des = document.getElementById('p-desc').value;
     const pre = document.getElementById('p-precio').value;
     const img = document.getElementById('p-img').value;
-    if (!nom || !pre || !img) return alert("Rellena el formulario del producto");
-    await addDoc(collection(db, "menu"), { nombre: nom, precio: parseInt(pre), categoria: cat, imagen: img });
+    if (!nom || !pre || !img) return alert("Rellena al menos Nombre, Precio e Imagen");
+    await addDoc(collection(db, "menu"), { nombre: nom, descripcion: des, precio: parseInt(pre), categoria: cat, imagen: img });
     alert("¡Menú actualizado!"); window.renderGerente();
 };
 
