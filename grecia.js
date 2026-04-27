@@ -33,7 +33,7 @@ const ESTILOS_GLOBALES = `
     .text-gold { color: var(--gold) !important; }
     .card-admin { background: rgba(255,255,255,0.05); border: 1px solid var(--gold); border-radius: 12px; padding: 20px; height: 100%; }
     .desc-platillo { font-size: 0.85rem; color: #bbb; font-style: italic; margin-top: 5px; }
-    @media print { .no-print { display: none !important; } .modal-backdrop { display: none !important; } }
+    @media print { .no-print { display: none !important; } .modal-backdrop { display: none !important; } .modal-content { border: none !important; } }
 </style>`;
 
 window.scrollToSection = (id) => {
@@ -59,21 +59,11 @@ window.renderLanding = async () => {
             <h2 class="text-center mb-5 text-gold">Nuestro Menú</h2>
             <div id="menu-previo" class="row g-4"></div>
         </section>
-        <section id="promos-section" class="py-5 bg-greek-dark">
-            <div class="container text-center">
-                <h2 class="mb-5 text-gold">Promociones del Olimpo</h2>
-                <div class="row g-4">
-                    <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>2x1</h3><h4>Gyros</h4><p>Martes y Jueves</p></div></div>
-                    <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>15%</h3><h4>Estudiantes</h4><p>Credencial vigente</p></div></div>
-                    <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>FREE</h3><h4>Baklava</h4><p>En tu primera reserva</p></div></div>
-                </div>
-            </div>
-        </section>
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4 text-gold">Ubicación</h2>
             <p class="text-white-50">Visítanos en Multiplaza Aragón, Ecatepec</p>
             <div class="glass-card p-0 overflow-hidden" style="height: 400px;">
-                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15042.062080884638!2d-99.0305886!3d19.5303356!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb1b63293883%3A0x6b48ad0a722f462a!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713456000000!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe>
+                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.3125!2d-99.0296!3d19.5348!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f00000000000%3A0x0!2zMTnCsDMyJzA1LjIiTiA5OcKwMDEnNDYuNiJX!5e0!3m2!1ses-419!2smx!4v1710000000000" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
     await window.cargarMenuPrevio();
@@ -88,11 +78,10 @@ window.cargarMenuPrevio = async () => {
         container.innerHTML += `
             <div class="col-md-4">
                 <div class="glass-card text-center h-100">
-                    <img src="${p.imagen}" class="img-fluid rounded mb-3" style="height:180px; width:100%; object-fit:cover;">
+                    <img src="${p.imagen}" onerror="this.src='https://placehold.co/400x300?text=Griego'" class="img-fluid rounded mb-3" style="height:180px; width:100%; object-fit:cover;">
                     <h4 class="mb-0">${p.nombre}</h4>
-                    <p class="desc-platillo">(${p.descripcion || 'Sin descripción'})</p>
+                    <p class="desc-platillo">(${p.descripcion || 'Especialidad de la casa'})</p>
                     <h5 class="text-gold">$${p.precio}</h5>
-                    <small class="text-white-50">${p.categoria.replace('_', ' ')}</small>
                 </div>
             </div>`;
     });
@@ -120,7 +109,7 @@ window.showAuth = (esPersonal = false) => {
 window.handleLogin = async () => {
     const e = document.getElementById('auth-e').value;
     const p = document.getElementById('auth-p').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Error al entrar"); }
+    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Credenciales incorrectas"); }
 };
 
 window.showRegister = () => {
@@ -159,12 +148,18 @@ window.renderReservaCliente = async () => {
                 </div>
                 <div class="col-lg-5">
                     <div class="glass-card">
-                        <h4 class="text-gold mb-3 text-center">Historial de Visitas</h4>
+                        <h4 class="text-gold mb-3 text-center">Mis Reservaciones</h4>
                         <div id="lista-historial"></div>
                     </div>
                 </div>
             </div>
-        </div>`;
+        </div>
+        <div class="modal fade" id="modalTicket" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-white text-dark"><div class="modal-body text-center p-4">
+            <h4 class="fw-bold">RESERVACIÓN CONFIRMADA</h4><hr>
+            <div id="ticket-info"></div><hr>
+            <p class="text-danger fw-bold small">¡TOMA CAPTURA DE PANTALLA O IMPRIME!</p>
+            <button class="btn btn-dark w-100 no-print" onclick="window.print()">IMPRIMIR TICKET</button>
+        </div></div></div></div>`;
 
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
         const grid = document.getElementById('grid-reserva');
@@ -190,6 +185,7 @@ window.renderReservaCliente = async () => {
                     <div><b>Mesa ${r.mesa}</b><br><small class="text-white-50">${r.fecha} | ${r.hora}</small></div>
                     <span class="status-${r.estado}">${r.estado.toUpperCase()}</span>
                 </div>
+                ${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${d.id}', '${r.mesa}')">Cancelar Reservación</button>` : ""}
             </div>`;
         });
     });
@@ -202,8 +198,17 @@ window.saveReserva = async () => {
     if(!f) return alert("Selecciona una fecha");
     const data = { cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, mesa: mesaActiva, estado: "confirmada", productos: [], total: 0 };
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), data);
-    await addDoc(collection(db, "historial_reservas"), data);
-    alert("Reservación Exitosa"); window.renderReservaCliente();
+    const docRef = await addDoc(collection(db, "historial_reservas"), data);
+    
+    document.getElementById('ticket-info').innerHTML = `<h3>MESA ${mesaActiva}</h3><p><b>Fecha:</b> ${f}<br><b>Hora:</b> ${h}</p><p>${p} Personas</p><small>ID: ${docRef.id}</small>`;
+    new bootstrap.Modal('#modalTicket').show();
+};
+
+window.cancelarReserva = async (idH, idM) => {
+    if(confirm("¿Estás seguro de que deseas cancelar esta reservación?")) {
+        await updateDoc(doc(db, "historial_reservas", idH), { estado: "vencida" });
+        await deleteDoc(doc(db, "mesas_activas", idM));
+    }
 };
 
 window.renderGerente = () => {
@@ -214,43 +219,42 @@ window.renderGerente = () => {
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="card-admin">
-                        <h4 class="text-gold mb-3">Agregar al Menú</h4>
-                        <label class="small text-white-50">Categoría</label>
+                        <h4 class="text-gold mb-3">Gestión de Menú</h4>
                         <select id="p-categoria" class="form-select mb-2">
                             <option value="entrada">Entrada</option>
                             <option value="plato_fuerte">Plato Fuerte</option>
                             <option value="postre">Postre</option>
                             <option value="bebida">Bebida</option>
                         </select>
-                        <input id="p-nombre" class="form-control mb-2" placeholder="Nombre (Ej: Tzatziki)">
-                        <textarea id="p-desc" class="form-control mb-2" placeholder="Descripción (Ej: Yogur con pepino y ajo)"></textarea>
+                        <input id="p-nombre" class="form-control mb-2" placeholder="Nombre del platillo">
+                        <textarea id="p-desc" class="form-control mb-2" placeholder="Descripción breve..."></textarea>
                         <input id="p-precio" type="number" class="form-control mb-2" placeholder="Precio ($)">
-                        <input id="p-img" class="form-control mb-3" placeholder="URL de la Imagen">
-                        <button onclick="window.guardarProducto()" class="btn btn-primary w-100">Guardar en Menú</button>
+                        <input id="p-img" class="form-control mb-3" placeholder="URL de la imagen">
+                        <button onclick="window.guardarProducto()" class="btn btn-primary w-100">Actualizar Menú</button>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card-admin">
-                        <h4 class="text-gold mb-3">Nuevo Mesero</h4>
+                        <h4 class="text-gold mb-3">Registrar Mesero</h4>
                         <input id="m-nombre" class="form-control mb-2" placeholder="Nombre Completo">
                         <input id="m-email" class="form-control mb-2" placeholder="Correo">
-                        <input id="m-pass" type="password" class="form-control mb-3" placeholder="Contraseña">
-                        <button onclick="window.crearMesero()" class="btn btn-outline-gold w-100">Registrar Mesero</button>
+                        <input id="m-pass" type="password" class="form-control mb-3" placeholder="Password Temporal">
+                        <button onclick="window.crearMesero()" class="btn btn-outline-gold w-100">Dar de Alta</button>
                     </div>
                 </div>
                 <div class="col-md-4 text-center">
                     <div class="card-admin">
-                        <h4 class="text-gold mb-4">Balance General</h4>
+                        <h4 class="text-gold mb-4">Total en Caja</h4>
                         <h2 id="total-caja" class="display-6 mb-4 text-white">$0</h2>
-                        <button class="btn btn-gold w-100 mb-2" onclick="window.scrollToSection('seccion-ventas')">Ver Ventas</button>
+                        <button class="btn btn-gold w-100 mb-2" onclick="window.scrollToSection('seccion-ventas')">Ver Reporte</button>
                     </div>
                 </div>
             </div>
             <div id="seccion-ventas" class="mt-5">
-                <h4 class="text-gold mb-3">Historial de Ventas</h4>
+                <h4 class="text-gold mb-3">Historial Detallado de Ventas</h4>
                 <div class="glass-card table-responsive">
                     <table class="table table-dark table-hover align-middle">
-                        <thead><tr><th>Fecha</th><th>Mesa</th><th>Mesero</th><th>Venta Total</th></tr></thead>
+                        <thead><tr><th>Fecha / Hora</th><th>Mesa</th><th>Mesero Encargado</th><th>Total</th></tr></thead>
                         <tbody id="lista-ventas-body"></tbody>
                     </table>
                 </div>
@@ -263,11 +267,11 @@ window.crearMesero = async () => {
     const n = document.getElementById('m-nombre').value;
     const e = document.getElementById('m-email').value;
     const p = document.getElementById('m-pass').value;
-    if(!n || !e || !p) return alert("Completa todos los campos");
+    if(!n || !e || !p) return alert("Faltan datos");
     try {
         const res = await createUserWithEmailAndPassword(auth, e, p);
         await setDoc(doc(db, "usuarios", res.user.uid), { nombre: n, correo: e, rol: "mesero" });
-        alert("Mesero registrado"); window.renderGerente();
+        alert("Mesero registrado correctamente");
     } catch (err) { alert(err.message); }
 };
 
@@ -277,23 +281,23 @@ window.guardarProducto = async () => {
     const des = document.getElementById('p-desc').value;
     const pre = document.getElementById('p-precio').value;
     const img = document.getElementById('p-img').value;
-    if (!nom || !pre || !img) return alert("Rellena al menos Nombre, Precio e Imagen");
+    if (!nom || !pre || !img) return alert("Nombre, Precio e Imagen son obligatorios");
     await addDoc(collection(db, "menu"), { nombre: nom, descripcion: des, precio: parseInt(pre), categoria: cat, imagen: img });
-    alert("¡Menú actualizado!"); window.renderGerente();
+    alert("Platillo agregado al sistema");
 };
 
 window.cargarHistorialVentas = async () => {
     const snap = await getDocs(collection(db, "ventas_finalizadas"));
     const container = document.getElementById('lista-ventas-body');
     let totalCaja = 0;
-    container.innerHTML = "";
+    if(!container) return; container.innerHTML = "";
     snap.forEach(doc => {
         const v = doc.data();
         totalCaja += v.total;
         container.innerHTML += `<tr>
             <td>${v.fecha_venta}</td>
             <td>Mesa ${v.mesa}</td>
-            <td>${v.mesero_nombre || '---'}</td>
+            <td>${v.mesero_nombre || 'Autoservicio'}</td>
             <td class="text-gold fw-bold">$${v.total}</td>
         </tr>`;
     });
@@ -304,17 +308,17 @@ window.renderMesero = () => {
     document.getElementById('main-content').innerHTML = `
         <div id="inicio"></div>
         <div class="container my-5">
-            <h2 class="text-center mb-4 text-gold">Gestión de Mesas</h2>
+            <h2 class="text-center mb-4 text-gold">Terminal de Meseros</h2>
             <div class="row">
                 <div class="col-md-4"><div class="glass-card"><h4>Mesas</h4><div id="grid-mesas-m" class="grid-mesas"></div></div></div>
                 <div id="area-atencion" class="col-md-8 d-none">
                     <div class="glass-card">
                         <h3 class="text-center">Mesa: <span id="m-atend" class="text-gold">--</span></h3>
-                        <p class="text-center text-white-50">Atiende: ${nombreUsuarioActual}</p>
-                        <select id="select-platillo" class="form-select mb-3" onchange="window.abrirModalCantidad(this.value)"><option value="" disabled selected>Añadir producto...</option></select>
+                        <p class="text-center text-white-50">Atendido por: ${nombreUsuarioActual}</p>
+                        <select id="select-platillo" class="form-select mb-3" onchange="window.abrirModalCantidad(this.value)"><option value="" disabled selected>Agregar a la orden...</option></select>
                         <div id="lista-pedido" class="mb-4"></div>
                         <h4 class="text-end text-gold">Subtotal: $<span id="total-atencion">0</span></h4>
-                        <button class="btn btn-primary w-100" onclick="window.generarTicketFinal()">COBRAR MESA</button>
+                        <button class="btn btn-primary w-100" onclick="window.generarTicketFinal()">CERRAR CUENTA Y COBRAR</button>
                     </div>
                 </div>
             </div>
@@ -326,7 +330,7 @@ window.renderMesero = () => {
                 <h2 id="p-cant-modal">1</h2>
                 <button class="btn btn-outline-gold" onclick="window.modCant(1)">+</button>
             </div>
-            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AÑADIR AL PEDIDO</button>
+            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AÑADIR</button>
         </div></div></div></div>`;
     getDocs(collection(db, "menu")).then(snap => {
         const sel = document.getElementById('select-platillo');
@@ -349,7 +353,7 @@ window.renderMesero = () => {
 window.atenderMesa = async (id, data) => {
     mesaActiva = id;
     if(!data) {
-        const pers = prompt(`¿Cuántas personas en Mesa ${id}?`, "2");
+        const pers = prompt(`Comensales en Mesa ${id}:`, "2");
         if(!pers) return;
         data = { cliente: "Presencial", mesero_asignado: auth.currentUser.email, mesero_nombre: nombreUsuarioActual, personas: pers, productos: [], total: 0 };
         await setDoc(doc(db, "mesas_activas", id.toString()), data);
@@ -364,61 +368,4 @@ window.abrirModalCantidad = (val) => {
     if(!val) return; prodTemp = JSON.parse(val); cantTemp = 1;
     document.getElementById('p-nombre-modal').innerText = prodTemp.nombre;
     document.getElementById('p-cant-modal').innerText = cantTemp;
-    new bootstrap.Modal('#modalCantidad').show();
-};
-
-window.modCant = (v) => { cantTemp = Math.max(1, cantTemp + v); document.getElementById('p-cant-modal').innerText = cantTemp; };
-
-window.confirmarProducto = async () => {
-    pedidoLocal.push({ nombre: prodTemp.nombre, cantidad: cantTemp, subtotal: prodTemp.precio * cantTemp });
-    const total = pedidoLocal.reduce((acc, p) => acc + p.subtotal, 0);
-    await updateDoc(doc(db, "mesas_activas", mesaActiva.toString()), { productos: pedidoLocal, total: total });
-    bootstrap.Modal.getInstance('#modalCantidad').hide();
-    window.renderListaPedido();
-};
-
-window.renderListaPedido = () => {
-    const container = document.getElementById('lista-pedido');
-    let total = 0; container.innerHTML = "";
-    pedidoLocal.forEach(p => { total += p.subtotal; container.innerHTML += `<div class="d-flex justify-content-between border-bottom border-secondary py-2 small"><span>${p.cantidad}x ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
-    document.getElementById('total-atencion').innerText = total;
-};
-
-window.generarTicketFinal = async () => {
-    const total = document.getElementById('total-atencion').innerText;
-    const snapM = await getDoc(doc(db, "mesas_activas", mesaActiva.toString()));
-    const dataM = snapM.data();
-    await addDoc(collection(db, "ventas_finalizadas"), { ...dataM, mesa: mesaActiva, total: parseInt(total), fecha_venta: new Date().toLocaleString(), mesero_nombre: nombreUsuarioActual });
-    document.getElementById('main-content').innerHTML = `
-        <div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg" style="font-family: monospace; max-width: 350px;">
-            <h4 class="text-center fw-bold">EL ORÁCULO DEL SABOR</h4><hr>
-            <p>MESA: ${mesaActiva}<br>ATENDIÓ: ${nombreUsuarioActual}</p><hr>
-            <div id="items-ticket"></div><hr>
-            <h4 class="d-flex justify-content-between"><span>TOTAL:</span> <span>$${total}</span></h4><hr>
-            <button class="btn btn-dark w-100 no-print" onclick="window.finalizarCobro()">PAGADO</button>
-        </div>`;
-    pedidoLocal.forEach(p => { document.getElementById('items-ticket').innerHTML += `<div class="d-flex justify-content-between"><span>${p.cantidad} ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
-};
-
-window.finalizarCobro = async () => {
-    await deleteDoc(doc(db, "mesas_activas", mesaActiva.toString()));
-    window.renderMesero();
-};
-
-onAuthStateChanged(auth, async (u) => {
-    if(u) {
-        const d = await getDoc(doc(db, "usuarios", u.uid));
-        const user = d.data();
-        nombreUsuarioActual = user.nombre;
-        document.getElementById('btn-logout').classList.remove('d-none');
-        if(user.rol === 'gerente') window.renderGerente();
-        else if(user.rol === 'mesero') window.renderMesero();
-        else window.renderReservaCliente();
-    } else {
-        document.getElementById('btn-logout').classList.add('d-none');
-        window.renderLanding();
-    }
-});
-
-document.getElementById('btn-logout').onclick = () => signOut(auth);
-window.renderLanding();
+    new bootstrap.Modal('#modalCantidad
