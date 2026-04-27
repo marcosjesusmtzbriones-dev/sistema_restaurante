@@ -72,7 +72,7 @@ window.renderLanding = async () => {
             <h2 class="mb-4 text-gold">Ubicación</h2>
             <p class="text-white-50">Visítanos en Multiplaza Aragón, Ecatepec</p>
             <div class="glass-card p-0 overflow-hidden" style="height: 400px;">
-                <iframe width="100%" height="100%" style="border:0;" src="http://googleusercontent.com/maps.google.com/7" allowfullscreen="" loading="lazy"></iframe>
+                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d15042.062080884638!2d-99.0305886!3d19.5303356!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb1b63293883%3A0x6b48ad0a722f462a!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1713456000000!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
     await window.cargarMenuPrevio();
@@ -81,11 +81,10 @@ window.renderLanding = async () => {
 window.cargarMenuPrevio = async () => {
     const snap = await getDocs(collection(db, "menu"));
     const container = document.getElementById('menu-previo');
-    if(!container) return;
-    container.innerHTML = "";
+    if(!container) return; container.innerHTML = "";
     snap.forEach(doc => {
         const p = doc.data();
-        container.innerHTML += `<div class="col-md-4"><div class="glass-card text-center h-100"><img src="${p.imagen}" class="img-fluid rounded mb-3" style="height:180px; width:100%; object-fit:cover;"><h4>${p.nombre}</h4><h5 class="text-gold">$${p.precio}</h5></div></div>`;
+        container.innerHTML += `<div class="col-md-4"><div class="glass-card text-center h-100"><img src="${p.imagen}" class="img-fluid rounded mb-3" style="height:180px; width:100%; object-fit:cover;"><h4>${p.nombre}</h4><h5 class="text-gold">$${p.precio}</h5><small class="text-white-50">${p.categoria.replace('_', ' ')}</small></div></div>`;
     });
 };
 
@@ -155,13 +154,7 @@ window.renderReservaCliente = async () => {
                     </div>
                 </div>
             </div>
-        </div>
-        <div class="modal fade" id="modalTicket" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-white text-dark"><div class="modal-body text-center p-4">
-            <h4 class="fw-bold">RESERVACIÓN CONFIRMADA</h4><hr>
-            <div id="ticket-info"></div><hr>
-            <p class="text-danger fw-bold small">¡TOMA CAPTURA DE PANTALLA!</p>
-            <button class="btn btn-dark w-100 no-print" onclick="window.print()">IMPRIMIR</button>
-        </div></div></div></div>`;
+        </div>`;
 
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
         const grid = document.getElementById('grid-reserva');
@@ -187,7 +180,6 @@ window.renderReservaCliente = async () => {
                     <div><b>Mesa ${r.mesa}</b><br><small class="text-white-50">${r.fecha} | ${r.hora}</small></div>
                     <span class="status-${r.estado}">${r.estado.toUpperCase()}</span>
                 </div>
-                ${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${d.id}', '${r.mesa}')">Cancelar</button>` : ""}
             </div>`;
         });
     });
@@ -201,15 +193,7 @@ window.saveReserva = async () => {
     const data = { cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, mesa: mesaActiva, estado: "confirmada", productos: [], total: 0 };
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), data);
     await addDoc(collection(db, "historial_reservas"), data);
-    document.getElementById('ticket-info').innerHTML = `<h3>MESA ${mesaActiva}</h3><p>${f} | ${h}</p><p>${p} Personas</p>`;
-    new bootstrap.Modal('#modalTicket').show();
-};
-
-window.cancelarReserva = async (idH, idM) => {
-    if(confirm("¿Deseas cancelar tu reservación?")) {
-        await updateDoc(doc(db, "historial_reservas", idH), { estado: "vencida" });
-        await deleteDoc(doc(db, "mesas_activas", idM));
-    }
+    alert("Reservación Exitosa"); window.renderReservaCliente();
 };
 
 window.renderGerente = () => {
@@ -220,41 +204,42 @@ window.renderGerente = () => {
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="card-admin">
-                        <h4 class="text-gold mb-3">Gestionar Menú</h4>
+                        <h4 class="text-gold mb-3">Agregar al Menú</h4>
+                        <label class="small text-white-50">Categoría</label>
                         <select id="p-categoria" class="form-select mb-2">
-                            <option value="bebida">Bebida</option>
                             <option value="entrada">Entrada</option>
                             <option value="plato_fuerte">Plato Fuerte</option>
                             <option value="postre">Postre</option>
+                            <option value="bebida">Bebida</option>
                         </select>
-                        <input id="p-nombre" class="form-control mb-2" placeholder="Nombre">
-                        <input id="p-precio" type="number" class="form-control mb-2" placeholder="Precio">
-                        <input id="p-img" class="form-control mb-3" placeholder="URL Imagen">
-                        <button onclick="window.guardarProducto()" class="btn btn-primary w-100">Guardar Item</button>
+                        <input id="p-nombre" class="form-control mb-2" placeholder="Nombre del Platillo/Bebida">
+                        <input id="p-precio" type="number" class="form-control mb-2" placeholder="Precio ($)">
+                        <input id="p-img" class="form-control mb-3" placeholder="URL de la Imagen">
+                        <button onclick="window.guardarProducto()" class="btn btn-primary w-100">Guardar en Menú</button>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="card-admin">
-                        <h4 class="text-gold mb-3">Alta de Meseros</h4>
+                        <h4 class="text-gold mb-3">Nuevo Mesero</h4>
                         <input id="m-nombre" class="form-control mb-2" placeholder="Nombre Completo">
-                        <input id="m-email" class="form-control mb-2" placeholder="Correo electrónico">
-                        <input id="m-pass" type="password" class="form-control mb-3" placeholder="Contraseña temporal">
+                        <input id="m-email" class="form-control mb-2" placeholder="Correo">
+                        <input id="m-pass" type="password" class="form-control mb-3" placeholder="Contraseña">
                         <button onclick="window.crearMesero()" class="btn btn-outline-gold w-100">Registrar Mesero</button>
                     </div>
                 </div>
                 <div class="col-md-4 text-center">
                     <div class="card-admin">
-                        <h4 class="text-gold mb-4">Total en Caja</h4>
+                        <h4 class="text-gold mb-4">Balance General</h4>
                         <h2 id="total-caja" class="display-6 mb-4 text-white">$0</h2>
-                        <button class="btn btn-gold w-100 mb-2" onclick="window.scrollToSection('seccion-ventas')">Ver Detalle de Ventas</button>
+                        <button class="btn btn-gold w-100 mb-2" onclick="window.scrollToSection('seccion-ventas')">Ver Ventas</button>
                     </div>
                 </div>
             </div>
             <div id="seccion-ventas" class="mt-5">
-                <h4 class="text-gold mb-3">Historial Detallado de Ventas</h4>
+                <h4 class="text-gold mb-3">Historial de Ventas</h4>
                 <div class="glass-card table-responsive">
                     <table class="table table-dark table-hover align-middle">
-                        <thead><tr><th>Fecha / Hora</th><th>Mesa</th><th>Mesero Encargado</th><th>Venta Total</th></tr></thead>
+                        <thead><tr><th>Fecha</th><th>Mesa</th><th>Mesero</th><th>Venta Total</th></tr></thead>
                         <tbody id="lista-ventas-body"></tbody>
                     </table>
                 </div>
@@ -267,13 +252,12 @@ window.crearMesero = async () => {
     const n = document.getElementById('m-nombre').value;
     const e = document.getElementById('m-email').value;
     const p = document.getElementById('m-pass').value;
-    if(!n || !e || !p) return alert("Por favor complete todos los datos del mesero");
+    if(!n || !e || !p) return alert("Completa todos los campos");
     try {
         const res = await createUserWithEmailAndPassword(auth, e, p);
         await setDoc(doc(db, "usuarios", res.user.uid), { nombre: n, correo: e, rol: "mesero" });
-        alert("Mesero registrado con éxito en el sistema");
-        window.renderGerente();
-    } catch (err) { alert("Error al registrar: " + err.message); }
+        alert("Mesero registrado"); window.renderGerente();
+    } catch (err) { alert(err.message); }
 };
 
 window.guardarProducto = async () => {
@@ -281,9 +265,9 @@ window.guardarProducto = async () => {
     const nom = document.getElementById('p-nombre').value;
     const pre = document.getElementById('p-precio').value;
     const img = document.getElementById('p-img').value;
-    if (!nom || !pre || !img) return alert("Faltan datos del producto");
+    if (!nom || !pre || !img) return alert("Rellena el formulario del producto");
     await addDoc(collection(db, "menu"), { nombre: nom, precio: parseInt(pre), categoria: cat, imagen: img });
-    alert("Producto guardado correctamente"); window.renderGerente();
+    alert("¡Menú actualizado!"); window.renderGerente();
 };
 
 window.cargarHistorialVentas = async () => {
@@ -296,8 +280,8 @@ window.cargarHistorialVentas = async () => {
         totalCaja += v.total;
         container.innerHTML += `<tr>
             <td>${v.fecha_venta}</td>
-            <td><span class="badge bg-secondary">Mesa ${v.mesa}</span></td>
-            <td><i class="text-white-50">${v.mesero_nombre || 'Cliente (Auto-servicio)'}</i></td>
+            <td>Mesa ${v.mesa}</td>
+            <td>${v.mesero_nombre || '---'}</td>
             <td class="text-gold fw-bold">$${v.total}</td>
         </tr>`;
     });
@@ -315,10 +299,10 @@ window.renderMesero = () => {
                     <div class="glass-card">
                         <h3 class="text-center">Mesa: <span id="m-atend" class="text-gold">--</span></h3>
                         <p class="text-center text-white-50">Atiende: ${nombreUsuarioActual}</p>
-                        <select id="select-platillo" class="form-select mb-3" onchange="window.abrirModalCantidad(this.value)"><option value="" disabled selected>Seleccionar Producto...</option></select>
+                        <select id="select-platillo" class="form-select mb-3" onchange="window.abrirModalCantidad(this.value)"><option value="" disabled selected>Añadir producto...</option></select>
                         <div id="lista-pedido" class="mb-4"></div>
                         <h4 class="text-end text-gold">Subtotal: $<span id="total-atencion">0</span></h4>
-                        <button class="btn btn-primary w-100" onclick="window.generarTicketFinal()">CERRAR Y PAGAR</button>
+                        <button class="btn btn-primary w-100" onclick="window.generarTicketFinal()">COBRAR MESA</button>
                     </div>
                 </div>
             </div>
@@ -330,11 +314,11 @@ window.renderMesero = () => {
                 <h2 id="p-cant-modal">1</h2>
                 <button class="btn btn-outline-gold" onclick="window.modCant(1)">+</button>
             </div>
-            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AÑADIR</button>
+            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AÑADIR AL PEDIDO</button>
         </div></div></div></div>`;
     getDocs(collection(db, "menu")).then(snap => {
         const sel = document.getElementById('select-platillo');
-        snap.forEach(d => { const p = d.data(); const opt = document.createElement('option'); opt.value = JSON.stringify({nombre: p.nombre, precio: p.precio}); opt.innerText = `${p.nombre} - $${p.precio}`; sel.appendChild(opt); });
+        snap.forEach(d => { const p = d.data(); const opt = document.createElement('option'); opt.value = JSON.stringify({nombre: p.nombre, precio: p.precio}); opt.innerText = `${p.nombre} ($${p.precio})`; sel.appendChild(opt); });
     });
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
         const grid = document.getElementById('grid-mesas-m');
@@ -353,7 +337,7 @@ window.renderMesero = () => {
 window.atenderMesa = async (id, data) => {
     mesaActiva = id;
     if(!data) {
-        const pers = prompt(`Comensales Mesa ${id}:`, "2");
+        const pers = prompt(`¿Cuántas personas en Mesa ${id}?`, "2");
         if(!pers) return;
         data = { cliente: "Presencial", mesero_asignado: auth.currentUser.email, mesero_nombre: nombreUsuarioActual, personas: pers, productos: [], total: 0 };
         await setDoc(doc(db, "mesas_activas", id.toString()), data);
@@ -392,9 +376,6 @@ window.generarTicketFinal = async () => {
     const total = document.getElementById('total-atencion').innerText;
     const snapM = await getDoc(doc(db, "mesas_activas", mesaActiva.toString()));
     const dataM = snapM.data();
-    const qH = query(collection(db, "historial_reservas"), where("mesa", "==", mesaActiva), where("estado", "==", "confirmada"));
-    const hSnap = await getDocs(qH);
-    hSnap.forEach(async d => await updateDoc(doc(db, "historial_reservas", d.id), { estado: "finalizada" }));
     await addDoc(collection(db, "ventas_finalizadas"), { ...dataM, mesa: mesaActiva, total: parseInt(total), fecha_venta: new Date().toLocaleString(), mesero_nombre: nombreUsuarioActual });
     document.getElementById('main-content').innerHTML = `
         <div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg" style="font-family: monospace; max-width: 350px;">
