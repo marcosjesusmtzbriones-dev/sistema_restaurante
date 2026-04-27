@@ -2,7 +2,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-// Cargamos la librería para PDF dinámicamente
+// Librería para PDF
 const scriptPdf = document.createElement('script');
 scriptPdf.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
 document.head.appendChild(scriptPdf);
@@ -58,7 +58,7 @@ const ESTILOS_GLOBALES = `
     .m-btn.seleccionada { background: var(--gold); color: black; }
     .m-btn.atendida { background: #51cf66; border: none; }
     
-    #ticket-descarga { padding: 20px; background: white; color: black; font-family: 'Courier New', Courier, monospace; }
+    #ticket-descarga { padding: 30px; background: white; color: black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
     @media print { .no-print { display: none !important; } }
 </style>`;
 
@@ -70,10 +70,10 @@ window.scrollToSection = (id) => {
 window.descargarTicket = () => {
     const elemento = document.getElementById('ticket-descarga');
     const opt = {
-        margin: 1,
+        margin: 0.5,
         filename: 'Ticket-Reserva-Oraculo.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2 },
+        html2canvas: { scale: 3 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
     html2pdf().set(opt).from(elemento).save();
@@ -91,37 +91,17 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
-
-        <section id="menu-section" class="container py-5">
-            <h2 class="text-center mb-5 text-gold display-4">Nuestro Menú</h2>
-            <div id="menu-previo" class="row g-4"></div>
-        </section>
-
+        <section id="menu-section" class="container py-5"><h2 class="text-center mb-5 text-gold display-4">Nuestro Menú</h2><div id="menu-previo" class="row g-4"></div></section>
         <section id="promos-section" class="container py-5">
             <h2 class="text-center mb-5 text-gold display-4">Promociones del Olimpo</h2>
             <div class="row g-4">
-                <div class="col-md-6">
-                    <div class="glass-card">
-                        <h3 class="text-gold">2x1 en Gyros</h3>
-                        <p>Todos los jueves en Multiplaza Aragón. ¡No te lo pierdas!</p>
-                        <span class="badge bg-primary">Jueves Heroicos</span>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="glass-card">
-                        <h3 class="text-gold">Postre Gratis</h3>
-                        <p>En tu primera reservación en línea, el Baklava va por nuestra cuenta.</p>
-                        <span class="badge bg-primary">Exclusivo Web</span>
-                    </div>
-                </div>
+                <div class="col-md-6"><div class="glass-card"><h3 class="text-gold">2x1 en Gyros</h3><p>Todos los jueves en Multiplaza Aragón.</p><span class="badge bg-primary">Jueves Heroicos</span></div></div>
+                <div class="col-md-6"><div class="glass-card"><h3 class="text-gold">Postre Gratis</h3><p>Baklava cortesía en tu primera reservación web.</p><span class="badge bg-primary">Exclusivo Web</span></div></div>
             </div>
         </section>
-
         <section id="ubicacion-section" class="container py-5 text-center">
             <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec</p>
-            <div class="glass-card p-0 overflow-hidden" style="height: 400px;">
-                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3759.124571987515!2d-99.0272216!3d19.5362547!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f00609346513%3A0xc3c5443d3b73315!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714100000000!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe>
-            </div>
+            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="http://googleusercontent.com/maps.google.com/7" allowfullscreen="" loading="lazy"></iframe></div>
         </section>`;
     await window.cargarMenuPrevio();
 };
@@ -189,23 +169,22 @@ window.renderReservaCliente = async () => {
                         </div>
                         <input id="res-p" type="number" class="form-control mb-4" placeholder="Personas" value="2">
                         <div id="grid-reserva" class="grid-mesas mb-4"></div>
-                        <button id="btn-confirmar-res" class="btn btn-primary w-100 d-none" onclick="window.saveReserva()">CONFIRMAR RESERVA</button>
+                        <button id="btn-confirmar-res" class="btn btn-primary w-100 d-none" onclick="window.saveReserva()">RESERVAR</button>
                     </div>
                 </div>
-                <div class="col-lg-5"><div class="glass-card"><h4 class="text-gold mb-3 text-center">Mis Visitas</h4><div id="lista-historial"></div></div></div>
+                <div class="col-lg-5"><div class="glass-card"><h4 class="text-gold mb-3 text-center">Mi Historial</h4><div id="lista-historial"></div></div></div>
             </div>
         </div>
         <div class="modal fade" id="modalTicket" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
-                <div class="modal-content bg-white text-dark p-0 overflow-hidden">
+                <div class="modal-content bg-white text-dark p-0">
                     <div id="ticket-descarga">
                         <div class="text-center">
-                            <h4 class="fw-bold">EL ORÁCULO DEL SABOR</h4>
-                            <p class="small">Multiplaza Aragón, Ecatepec</p>
-                            <hr style="border-top: 2px dashed #000">
+                            <h5 class="fw-bold mb-1">El Oráculo del Sabor</h5>
+                            <h3 class="fw-bold mb-3">TICKET DE RESERVA</h3>
                             <div id="ticket-info"></div>
-                            <hr style="border-top: 2px dashed #000">
-                            <p class="small">Presenta este comprobante al llegar.<br>¡Buen provecho!</p>
+                            <h6 class="fw-bold mt-4" style="color: #d9534f;">¡TOMA CAPTURA DE PANTALLA!</h6>
+                            <p class="small mt-4 mb-0 text-muted">2026 El Oráculo del Sabor - Ecatepec, MX</p>
                         </div>
                     </div>
                     <div class="p-3 bg-light d-flex gap-2">
@@ -235,7 +214,7 @@ window.renderReservaCliente = async () => {
         if(!container) return; container.innerHTML = "";
         snap.forEach(d => {
             const r = d.data();
-            container.innerHTML += `<div class="historial-item"><div class="d-flex justify-content-between"><div><b>Mesa ${r.mesa}</b><br><small>${r.fecha} - ${r.hora}</small></div><span class="status-${r.estado}">${r.estado.toUpperCase()}</span></div>${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${d.id}', '${r.mesa}')">Cancelar</button>` : ""}</div>`;
+            container.innerHTML += `<div class="historial-item"><div class="d-flex justify-content-between"><div><b>Mesa ${r.mesa}-${r.fecha} | ${r.hora}</b><br><small>${r.personas} personas</small></div><span class="status-${r.estado}">${r.estado}</span></div>${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${d.id}', '${r.mesa}')">Cancelar</button>` : ""}</div>`;
         });
     });
 };
@@ -247,20 +226,16 @@ window.saveReserva = async () => {
     if(!f || !h) return alert("Selecciona fecha y hora");
     const data = { cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, mesa: mesaActiva, estado: "confirmada", productos: [], total: 0 };
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), data);
-    const ref = await addDoc(collection(db, "historial_reservas"), data);
+    await addDoc(collection(db, "historial_reservas"), data);
     
     document.getElementById('ticket-info').innerHTML = `
-        <h2 class="fw-bold">MESA ${mesaActiva}</h2>
-        <p class="mb-1"><b>FECHA:</b> ${f}</p>
-        <p class="mb-1"><b>HORA:</b> ${h}</p>
-        <p class="mb-1"><b>PERSONAS:</b> ${p}</p>
-        <p class="mt-3 small"><b>FOLIO:</b><br>${ref.id}</p>
+        <h2 class="fw-bold">Mesa ${mesaActiva}</h2>
+        <h4 class="mb-1">${f} - ${h}</h4>
+        <h5 class="fw-bold">${p} Personas</h5>
     `;
-    
     new bootstrap.Modal('#modalTicket').show();
 };
 
-// ... Resto de funciones (Gerente, Mesero, Auth) se mantienen igual ...
 window.cancelarReserva = async (idH, idM) => {
     if(confirm("¿Cancelar reservación?")) {
         await updateDoc(doc(db, "historial_reservas", idH), { estado: "vencida" });
@@ -378,7 +353,15 @@ window.generarTicketFinal = async () => {
     const snapM = await getDoc(doc(db, "mesas_activas", mesaActiva.toString()));
     const dataM = snapM.data();
     await addDoc(collection(db, "ventas_finalizadas"), { ...dataM, mesa: mesaActiva, total: parseInt(total), fecha_venta: new Date().toLocaleString(), mesero_nombre: nombreUsuarioActual });
-    document.getElementById('main-content').innerHTML = `<div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg text-center" style="max-width: 350px; font-family: monospace;"><h4>EL ORÁCULO DEL SABOR</h4><hr><p>Mesa: ${mesaActiva}<br>Atendió: ${nombreUsuarioActual}</p><hr><div id="items-ticket"></div><hr><h5>TOTAL: $${total}</h5><hr><button class="btn btn-dark w-100 no-print" onclick="window.finalizarCobro()">PAGADO</button></div>`;
+    
+    document.getElementById('main-content').innerHTML = `
+        <div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg text-center" style="max-width: 350px; font-family: monospace;">
+            <h4>EL ORÁCULO DEL SABOR</h4><hr>
+            <p>Mesa: ${mesaActiva}<br>Comensales: ${dataM.personas}<br>Atendió: ${nombreUsuarioActual}</p><hr>
+            <div id="items-ticket"></div><hr>
+            <h5>TOTAL: $${total}</h5><hr>
+            <button class="btn btn-dark w-100 no-print" onclick="window.finalizarCobro()">PAGADO</button>
+        </div>`;
     pedidoLocal.forEach(p => { document.getElementById('items-ticket').innerHTML += `<div class="d-flex justify-content-between"><span>${p.cantidad} ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
 };
 
