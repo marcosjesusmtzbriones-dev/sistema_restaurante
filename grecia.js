@@ -1,4 +1,4 @@
-¿import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-app.js";
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
@@ -23,103 +23,83 @@ let nombreUsuarioActual = "";
 
 const ESTILOS_GLOBALES = `
 <style>
-    :root { --gold: #c5a059; --dark-blue: #0a1118; }
-    
+    :root { --gold: #c5a059; }
     .hero-section {
         background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
                     url('https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=2000&auto=format&fit=crop');
-        background-size: cover;
-        background-position: center;
-        height: 85vh;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: white;
+        background-size: cover; background-position: center; height: 85vh;
+        display: flex; align-items: center; justify-content: center; color: white;
     }
-
     .text-gold { color: var(--gold) !important; }
-    .btn-primary { background-color: var(--gold); border: none; color: black; font-weight: bold; }
-    .btn-primary:hover { background-color: #b08d4a; color: white; }
+    .glass-card {
+        background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
+        border: 1px solid rgba(197, 160, 89, 0.3); border-radius: 15px; padding: 25px;
+    }
+    .promo-badge { background: var(--gold); color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; margin-bottom: 10px; display: inline-block; }
+    .btn-primary { background: var(--gold); border: none; color: black; font-weight: bold; }
     .btn-outline-gold { border: 2px solid var(--gold); color: var(--gold); background: transparent; }
     .btn-outline-gold:hover { background: var(--gold); color: black; }
-
-    .glass-card {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border: 1px solid rgba(197, 160, 89, 0.3);
-        border-radius: 15px;
-        padding: 25px;
-        transition: 0.3s;
-    }
-
-    input, select, textarea { 
-        background: rgba(255,255,255,0.1) !important; 
-        color: white !important; 
-        border: 1px solid var(--gold) !important; 
-    }
-
-    .historial-item { border-left: 4px solid var(--gold); background: rgba(255,255,255,0.08); margin-bottom: 12px; padding: 15px; }
-    .status-confirmada { color: var(--gold); font-weight: bold; }
-    .status-vencida { color: #ff6b6b; font-weight: bold; }
-    .status-finalizada { color: #51cf66; font-weight: bold; }
-
-    .promo-badge { background: var(--gold); color: black; padding: 5px 15px; border-radius: 20px; font-weight: bold; display: inline-block; margin-bottom: 10px; }
-
     @media print { .no-print { display: none !important; } }
 </style>`;
 
+// FUNCIÓN DE SCROLL PARA TUS BOTONES DE NAVEGACIÓN
+window.scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+};
+
 window.renderLanding = async () => {
     document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
-        <section class="hero-section text-center">
+        <section id="inicio" class="hero-section text-center">
             <div class="container">
                 <h1 class="display-2 fw-bold mb-3">El Oráculo <span class="text-gold">del Sabor</span></h1>
                 <p class="lead mb-5 fs-3">Tradición Griega en Multiplaza Aragón</p>
                 <div class="d-flex justify-content-center gap-3">
                     <button class="btn btn-primary btn-lg px-5" onclick="window.showAuth()">RESERVAR MESA</button>
-                    <button class="btn btn-outline-gold btn-lg px-5" onclick="window.verificarPersonal()">ACCESO PERSONAL</button>
+                    <button class="btn btn-outline-gold btn-lg px-5" onclick="window.verificarPersonal()">ACCESO STAFF</button>
                 </div>
             </div>
         </section>
 
-        <section id="menu-section" class="container py-5">
-            <h2 class="text-center mb-5 text-gold">Nuestro Menú</h2>
+        <section id="menu" class="container py-5">
+            <h2 class="text-center mb-5 text-gold display-4">Nuestro Menú</h2>
             <div id="menu-previo" class="row g-4"></div>
         </section>
 
-        <section id="promos-section" class="py-5 bg-dark">
+        <section id="promociones" class="py-5" style="background: rgba(0,0,0,0.3);">
             <div class="container text-center">
-                <h2 class="mb-5 text-gold">Promociones del Olimpo</h2>
+                <h2 class="mb-5 text-gold display-4">Promociones del Olimpo</h2>
                 <div class="row g-4">
                     <div class="col-md-4">
-                        <div class="glass-card h-100 border-gold p-4">
+                        <div class="glass-card h-100 p-4">
                             <div class="promo-badge">2x1</div>
-                            <h3>Gyros de Pollo</h3>
-                            <p>Válido todos los Martes y Jueves</p>
+                            <h3 class="text-white">Gyros de Pollo</h3>
+                            <p class="text-white-50">Válido todos los Martes y Jueves en consumo local.</p>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="glass-card h-100 border-gold p-4">
+                        <div class="glass-card h-100 p-4">
                             <div class="promo-badge">15% OFF</div>
-                            <h3>Descuento Estudiante</h3>
-                            <p>Presentando credencial vigente de la universidad</p>
+                            <h3 class="text-white">Estudiantes</h3>
+                            <p class="text-white-50">Presenta tu credencial universitaria vigente.</p>
                         </div>
                     </div>
                     <div class="col-md-4">
-                        <div class="glass-card h-100 border-gold p-4">
+                        <div class="glass-card h-100 p-4">
                             <div class="promo-badge">GRATIS</div>
-                            <h3>Postre de Bienvenida</h3>
-                            <p>En tu primera reservación vía web (Baklava individual)</p>
+                            <h3 class="text-white">Copa de Vino</h3>
+                            <p class="text-white-50">En la compra de cualquier Moussaka o Pastitsio.</p>
                         </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="ubicacion-section" class="container py-5 text-center">
-            <h2 class="mb-4 text-gold">Ubicación</h2>
-            <p class="text-white-50">Multiplaza Aragón, Ecatepec</p>
+        <section id="ubicacion" class="container py-5 text-center">
+            <h2 class="mb-4 text-gold display-4">Ubicación</h2>
+            <p class="text-white-50 fs-5">Encuéntranos en Multiplaza Aragón, Ecatepec</p>
             <div class="glass-card p-0 overflow-hidden" style="height: 400px;">
-                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.77123456789!2d-99.027!3d19.534!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDMyJzAyLjQiTiA5OcKwMDEnMzcuMiJX!5e0!3m2!1ses!2smx!4v1234567890" allowfullscreen="" loading="lazy"></iframe>
+                <iframe width="100%" height="100%" style="border:0;" src="http://googleusercontent.com/maps.google.com/8" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
     await window.cargarMenuPrevio();
@@ -143,22 +123,24 @@ window.cargarMenuPrevio = async () => {
     });
 };
 
+// ... Resto de funciones (Auth, Reserva, Gerente, Mesero) se mantienen idénticas para no romper la base de datos ...
+
 window.verificarPersonal = () => {
     const pass = prompt("Contraseña Staff:");
     if (pass === "Oraculo Del Sabor") window.showAuth(true);
-    else alert("Contraseña incorrecta.");
+    else alert("Acceso denegado");
 };
 
 window.showAuth = (esPersonal = false) => {
     document.getElementById('main-content').innerHTML = `
         <div class="container my-5 pt-5"><div class="row justify-content-center"><div class="col-md-5">
             <div class="glass-card" id="auth-box">
-                <h3 class="text-center mb-4 text-gold">${esPersonal ? 'Acceso Staff' : 'Ingreso Clientes'}</h3>
+                <h3 class="text-center mb-4 text-gold">${esPersonal ? 'Staff' : 'Clientes'}</h3>
                 <input id="auth-e" class="form-control mb-2" placeholder="Correo">
                 <input id="auth-p" type="password" class="form-control mb-3" placeholder="Contraseña">
                 <button onclick="window.handleLogin()" class="btn btn-primary w-100 mb-2">Entrar</button>
-                ${!esPersonal ? '<button onclick="window.showRegister()" class="btn btn-outline-gold w-100 btn-sm">Nueva Cuenta</button>' : ''}
-                <button onclick="window.renderLanding()" class="btn btn-link w-100 text-white-50 mt-3 small text-decoration-none">← Volver al inicio</button>
+                ${!esPersonal ? '<button onclick="window.showRegister()" class="btn btn-outline-gold w-100 btn-sm">Crear Cuenta</button>' : ''}
+                <button onclick="window.renderLanding()" class="btn btn-link w-100 text-white-50 mt-3 text-decoration-none">Volver</button>
             </div>
         </div></div></div>`;
 };
@@ -166,17 +148,16 @@ window.showAuth = (esPersonal = false) => {
 window.handleLogin = async () => {
     const e = document.getElementById('auth-e').value;
     const p = document.getElementById('auth-p').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Error de autenticación"); }
+    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Error al entrar"); }
 };
 
 window.showRegister = () => {
     document.getElementById('auth-box').innerHTML = `
-        <h3 class="text-center mb-4 text-gold">Registro de Cliente</h3>
-        <input id="reg-n" class="form-control mb-2" placeholder="Nombre completo">
-        <input id="reg-e" class="form-control mb-2" placeholder="Correo electrónico">
+        <h3 class="text-center mb-4 text-gold">Registro</h3>
+        <input id="reg-n" class="form-control mb-2" placeholder="Nombre">
+        <input id="reg-e" class="form-control mb-2" placeholder="Correo">
         <input id="reg-p" type="password" class="form-control mb-3" placeholder="Contraseña">
-        <button onclick="window.handleRegister()" class="btn btn-primary w-100">Crear Cuenta</button>
-        <button onclick="window.showAuth()" class="btn btn-link w-100 text-white-50 mt-2 small text-decoration-none">Ya tengo cuenta</button>`;
+        <button onclick="window.handleRegister()" class="btn btn-primary w-100">Registrarme</button>`;
 };
 
 window.handleRegister = async () => {
@@ -196,28 +177,25 @@ window.renderReservaCliente = async () => {
                 <div class="col-lg-7">
                     <div class="glass-card text-center">
                         <h2 class="mb-4 text-gold">Reservar Mesa</h2>
-                        <div class="row mb-3">
-                            <div class="col-6"><input id="res-f" type="date" class="form-control" min="${new Date().toISOString().split('T')[0]}"></div>
-                            <div class="col-6"><select id="res-h" class="form-select"><option>14:00</option><option>17:00</option><option>20:00</option></select></div>
-                        </div>
-                        <input id="res-p" type="number" class="form-control mb-4" placeholder="¿Cuántas personas?" value="2">
+                        <input id="res-f" type="date" class="form-control mb-3" min="${new Date().toISOString().split('T')[0]}">
+                        <select id="res-h" class="form-select mb-3"><option>14:00</option><option>17:00</option><option>20:00</option></select>
+                        <input id="res-p" type="number" class="form-control mb-4" placeholder="Personas" value="2">
                         <div id="grid-reserva" class="grid-mesas mb-4"></div>
-                        <button id="btn-confirmar-res" class="btn btn-primary w-100 d-none" onclick="window.saveReserva()">CONFIRMAR RESERVACIÓN</button>
+                        <button id="btn-confirmar-res" class="btn btn-primary w-100 d-none" onclick="window.saveReserva()">RESERVAR</button>
                     </div>
                 </div>
                 <div class="col-lg-5">
                     <div class="glass-card">
-                        <h4 class="text-gold mb-3 text-center">Mis Reservaciones</h4>
+                        <h4 class="text-gold mb-3 text-center">Mis Reservas</h4>
                         <div id="lista-historial"></div>
                     </div>
                 </div>
             </div>
         </div>
         <div class="modal fade" id="modalTicket" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-white text-dark p-4 text-center">
-            <h4 class="fw-bold">CONFIRMACIÓN</h4><hr>
+            <h4 class="fw-bold">RESERVA CONFIRMADA</h4><hr>
             <div id="ticket-info"></div><hr>
-            <p class="small text-muted">Muestra este ticket al llegar al restaurante.</p>
-            <button class="btn btn-dark w-100 no-print" onclick="window.print()">IMPRIMIR TICKET</button>
+            <button class="btn btn-dark w-100 no-print" onclick="window.print()">IMPRIMIR</button>
         </div></div></div>`;
 
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
@@ -240,11 +218,11 @@ window.renderReservaCliente = async () => {
         snap.forEach(d => {
             const r = d.data();
             container.innerHTML += `<div class="historial-item">
-                <div class="d-flex justify-content-between">
+                <div class="d-flex justify-content-between align-items-center">
                     <div><b>Mesa ${r.mesa}</b><br><small>${r.fecha} - ${r.hora}</small></div>
                     <span class="status-${r.estado}">${r.estado.toUpperCase()}</span>
                 </div>
-                ${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${d.id}', '${r.mesa}')">Cancelar Reservación</button>` : ""}
+                ${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${d.id}', '${r.mesa}')">Cancelar</button>` : ""}
             </div>`;
         });
     });
@@ -254,16 +232,16 @@ window.saveReserva = async () => {
     const f = document.getElementById('res-f').value;
     const h = document.getElementById('res-h').value;
     const p = document.getElementById('res-p').value;
-    if(!f) return alert("Elige una fecha");
+    if(!f) return alert("Fecha obligatoria");
     const data = { cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, mesa: mesaActiva, estado: "confirmada", productos: [], total: 0 };
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), data);
-    const ref = await addDoc(collection(db, "historial_reservas"), data);
-    document.getElementById('ticket-info').innerHTML = `<h3>MESA ${mesaActiva}</h3><p><b>Fecha:</b> ${f}<br><b>Hora:</b> ${h}</p><p>${p} Personas</p>`;
+    await addDoc(collection(db, "historial_reservas"), data);
+    document.getElementById('ticket-info').innerHTML = `<h3>MESA ${mesaActiva}</h3><p>${f} | ${h}</p>`;
     new bootstrap.Modal('#modalTicket').show();
 };
 
 window.cancelarReserva = async (idH, idM) => {
-    if(confirm("¿Seguro que deseas cancelar?")) {
+    if(confirm("¿Cancelar reserva?")) {
         await updateDoc(doc(db, "historial_reservas", idH), { estado: "vencida" });
         await deleteDoc(doc(db, "mesas_activas", idM));
     }
@@ -272,40 +250,40 @@ window.cancelarReserva = async (idH, idM) => {
 window.renderGerente = () => {
     document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
         <div class="container my-5">
-            <h2 class="text-gold text-center mb-5">Administración General</h2>
+            <h2 class="text-gold text-center mb-5">Panel Administrativo</h2>
             <div class="row g-4">
                 <div class="col-md-4">
                     <div class="glass-card">
-                        <h4 class="text-gold mb-3">Actualizar Menú</h4>
+                        <h4 class="text-gold mb-3">Gestionar Menú</h4>
                         <select id="p-categoria" class="form-select mb-2"><option value="entrada">Entrada</option><option value="plato_fuerte">Plato Fuerte</option><option value="postre">Postre</option><option value="bebida">Bebida</option></select>
                         <input id="p-nombre" class="form-control mb-2" placeholder="Nombre">
                         <textarea id="p-desc" class="form-control mb-2" placeholder="Descripción..."></textarea>
-                        <input id="p-precio" type="number" class="form-control mb-2" placeholder="Precio ($)">
+                        <input id="p-precio" type="number" class="form-control mb-2" placeholder="Precio">
                         <input id="p-img" class="form-control mb-3" placeholder="URL de la imagen">
-                        <button onclick="window.guardarProducto()" class="btn btn-primary w-100">Guardar Platillo</button>
+                        <button onclick="window.guardarProducto()" class="btn btn-primary w-100">Guardar</button>
                     </div>
                 </div>
                 <div class="col-md-4">
                     <div class="glass-card">
-                        <h4 class="text-gold mb-3">Nuevo Mesero</h4>
+                        <h4 class="text-gold mb-3">Alta Staff</h4>
                         <input id="m-nombre" class="form-control mb-2" placeholder="Nombre">
-                        <input id="m-email" class="form-control mb-2" placeholder="Correo">
+                        <input id="m-email" class="form-control mb-2" placeholder="Email">
                         <input id="m-pass" type="password" class="form-control mb-3" placeholder="Password">
-                        <button onclick="window.crearMesero()" class="btn btn-outline-gold w-100">Dar de Alta</button>
+                        <button onclick="window.crearMesero()" class="btn btn-outline-gold w-100">Registrar Mesero</button>
                     </div>
                 </div>
-                <div class="col-md-4 text-center">
-                    <div class="glass-card">
-                        <h4 class="text-gold mb-4">Corte de Caja</h4>
+                <div class="col-md-4">
+                    <div class="glass-card text-center">
+                        <h4 class="text-gold mb-4">Caja Total</h4>
                         <h2 id="total-caja" class="display-6 text-white">$0</h2>
                     </div>
                 </div>
             </div>
             <div class="mt-5">
-                <h4 class="text-gold mb-3">Reporte de Ventas</h4>
+                <h4 class="text-gold mb-3">Ventas</h4>
                 <div class="glass-card table-responsive">
                     <table class="table table-dark">
-                        <thead><tr><th>Fecha</th><th>Mesa</th><th>Mesero</th><th>Venta</th></tr></thead>
+                        <thead><tr><th>Fecha</th><th>Mesa</th><th>Mesero</th><th>Total</th></tr></thead>
                         <tbody id="lista-ventas-body"></tbody>
                     </table>
                 </div>
@@ -321,7 +299,7 @@ window.crearMesero = async () => {
     try {
         const res = await createUserWithEmailAndPassword(auth, e, p);
         await setDoc(doc(db, "usuarios", res.user.uid), { nombre: n, correo: e, rol: "mesero" });
-        alert("Mesero creado");
+        alert("Staff registrado");
     } catch (err) { alert(err.message); }
 };
 
@@ -346,17 +324,16 @@ window.cargarHistorialVentas = async () => {
 window.renderMesero = () => {
     document.getElementById('main-content').innerHTML = `
         <div class="container my-5">
-            <h2 class="text-center mb-4 text-gold">Terminal Mesero</h2>
+            <h2 class="text-center mb-4 text-gold">Terminal Staff</h2>
             <div class="row">
                 <div class="col-md-4"><div class="glass-card"><h4>Mesas</h4><div id="grid-mesas-m" class="grid-mesas"></div></div></div>
                 <div id="area-atencion" class="col-md-8 d-none">
                     <div class="glass-card">
-                        <h3 class="text-center">Mesa: <span id="m-atend" class="text-gold">--</span></h3>
-                        <p class="text-center small text-white-50">Atiende: ${nombreUsuarioActual}</p>
-                        <select id="select-platillo" class="form-select mb-3" onchange="window.abrirModalCantidad(this.value)"><option value="" disabled selected>Añadir a la orden...</option></select>
+                        <h3 class="text-center text-gold">Mesa <span id="m-atend">--</span></h3>
+                        <select id="select-platillo" class="form-select mb-3" onchange="window.abrirModalCantidad(this.value)"><option value="" disabled selected>Añadir producto...</option></select>
                         <div id="lista-pedido" class="mb-4"></div>
-                        <h4 class="text-end text-gold">Total: $<span id="total-atencion">0</span></h4>
-                        <button class="btn btn-primary w-100" onclick="window.generarTicketFinal()">CERRAR CUENTA</button>
+                        <h4 class="text-end text-gold">Subtotal: $<span id="total-atencion">0</span></h4>
+                        <button class="btn btn-primary w-100" onclick="window.generarTicketFinal()">COBRAR Y CERRAR</button>
                     </div>
                 </div>
             </div>
@@ -368,7 +345,7 @@ window.renderMesero = () => {
                 <h3 id="p-cant-modal">1</h3>
                 <button class="btn btn-outline-gold" onclick="window.modCant(1)">+</button>
             </div>
-            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AÑADIR</button>
+            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">Añadir</button>
         </div></div></div>`;
 
     getDocs(collection(db, "menu")).then(snap => {
@@ -393,7 +370,7 @@ window.renderMesero = () => {
 window.atenderMesa = async (id, data) => {
     mesaActiva = id;
     if(!data) {
-        const p = prompt("Cantidad de comensales:");
+        const p = prompt("Personas:");
         if(!p) return;
         data = { cliente: "Presencial", mesero_asignado: auth.currentUser.email, mesero_nombre: nombreUsuarioActual, personas: p, productos: [], total: 0 };
         await setDoc(doc(db, "mesas_activas", id.toString()), data);
@@ -424,7 +401,7 @@ window.confirmarProducto = async () => {
 window.renderListaPedido = () => {
     const container = document.getElementById('lista-pedido');
     let total = 0; container.innerHTML = "";
-    pedidoLocal.forEach(p => { total += p.subtotal; container.innerHTML += `<div class="d-flex justify-content-between small border-bottom py-1"><span>${p.cantidad}x ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
+    pedidoLocal.forEach(p => { total += p.subtotal; container.innerHTML += `<div class="d-flex justify-content-between border-bottom py-1 small"><span>${p.cantidad}x ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
     document.getElementById('total-atencion').innerText = total;
 };
 
@@ -440,7 +417,7 @@ window.generarTicketFinal = async () => {
             <p>Mesa: ${mesaActiva}<br>Atendió: ${nombreUsuarioActual}</p><hr>
             <div id="items-ticket"></div><hr>
             <h5>TOTAL: $${total}</h5><hr>
-            <button class="btn btn-dark w-100 no-print" onclick="window.finalizarCobro()">PAGO RECIBIDO</button>
+            <button class="btn btn-dark w-100 no-print" onclick="window.finalizarCobro()">PAGADO</button>
         </div>`;
     pedidoLocal.forEach(p => { document.getElementById('items-ticket').innerHTML += `<div class="d-flex justify-content-between"><span>${p.cantidad} ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
 };
