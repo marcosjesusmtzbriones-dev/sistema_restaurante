@@ -26,24 +26,19 @@ const ESTILOS_GLOBALES = `
     :root { --gold: #c5a059; }
     select, input { background-color: rgba(255,255,255,0.1) !important; color: white !important; border: 1px solid var(--gold) !important; }
     select option { background: #121212; color: white; }
-    .historial-item { border-left: 4px solid var(--gold); background: rgba(255,255,255,0.08); margin-bottom: 12px; padding: 15px; border-radius: 0 8px 8px 0; transition: 0.3s; }
-    .status-vencida { color: #ff6b6b; font-weight: bold; font-size: 0.85rem; }
-    .status-finalizada { color: #51cf66; font-weight: bold; font-size: 0.85rem; }
-    .status-confirmada { color: var(--gold); font-weight: bold; font-size: 0.85rem; }
+    .historial-item { border-left: 4px solid var(--gold); background: rgba(255,255,255,0.08); margin-bottom: 12px; padding: 15px; border-radius: 0 8px 8px 0; }
+    .status-vencida { color: #ff6b6b; font-weight: bold; }
+    .status-finalizada { color: #51cf66; font-weight: bold; }
+    .status-confirmada { color: var(--gold); font-weight: bold; }
     .text-gold { color: var(--gold) !important; }
-    @media print { .no-print { display: none !important; } }
+    @media print { .no-print { display: none !important; } .modal-backdrop { display: none !important; } }
 </style>`;
 
 // --- NAVEGACIÓN ---
 window.scrollToSection = (id) => {
     const el = document.getElementById(id);
-    if (el) {
-        el.scrollIntoView({ behavior: 'smooth' });
-    } else {
-        // Si el elemento no existe (estamos en un panel), recargamos para ir al inicio
-        window.location.href = "index.html#" + id;
-        location.reload();
-    }
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+    else { window.location.href = "index.html#" + id; location.reload(); }
 };
 
 window.renderLanding = async () => {
@@ -52,37 +47,19 @@ window.renderLanding = async () => {
         <section class="hero-section text-center text-white d-flex align-items-center justify-content-center" style="min-height: 80vh;">
             <div>
                 <h1 class="display-3 fw-bold">El Oráculo <span class="text-gold">del Sabor</span></h1>
-                <p class="lead">Auténtica Cocina Griega en Ecatepec</p>
+                <p class="lead">Tradición Griega en Ecatepec</p>
                 <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
-                    <button class="btn btn-primary btn-lg px-5" onclick="window.showAuth()">RESERVAR AHORA</button>
+                    <button class="btn btn-primary btn-lg px-5" onclick="window.showAuth()">RESERVAR MESA</button>
                     <button class="btn btn-outline-gold btn-lg px-5" onclick="window.verificarPersonal()">ACCESO PERSONAL</button>
                 </div>
             </div>
         </section>
-
-        <section id="menu-section" class="container my-5">
-            <h2 class="text-center mb-5 text-gold">Nuestro Menú Especial</h2>
-            <div id="menu-previo" class="row g-4"></div>
-        </section>
-
-        <section id="promos-section" class="py-5 bg-greek-dark">
-            <div class="container text-center">
-                <h2 class="mb-5 text-gold">Promociones del Olimpo</h2>
-                <div class="row g-4">
-                    <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>2x1</h3><h4>Gyros Clásicos</h4><p>Martes y Jueves</p></div></div>
-                    <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>15%</h3><h4>Estudiantes</h4><p>Credencial vigente</p></div></div>
-                    <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>GRATIS</h3><h4>Postre Baklava</h4><p>En tu primera reserva</p></div></div>
-                </div>
-            </div>
-        </section>
-
-        <section id="ubicacion-section" class="container my-5 text-center">
-            <h2 class="mb-4 text-gold">Ubicación</h2>
-            <p class="text-white-50">Multiplaza Aragón, Ecatepec de Morelos.</p>
-            <div class="glass-card p-0 overflow-hidden" style="height: 400px;">
-                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.316496668743!2d-99.0298285!3d19.5286548!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb1e204c3213%3A0x64b4a39f603c4f93!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714150000000!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe>
-            </div>
-        </section>`;
+        <section id="menu-section" class="container my-5"><h2 class="text-center mb-5 text-gold">Nuestro Menú</h2><div id="menu-previo" class="row g-4"></div></section>
+        <section id="promos-section" class="py-5 bg-greek-dark"><div class="container text-center"><h2 class="mb-5 text-gold">Promociones</h2><div class="row g-4">
+            <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>2x1</h3><h4>Gyros</h4><p>Martes y Jueves</p></div></div>
+            <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>15%</h3><h4>Estudiantes</h4><p>Credencial vigente</p></div></div>
+            <div class="col-md-4"><div class="glass-card h-100 border-gold p-4"><h3>FREE</h3><h4>Baklava</h4><p>En tu primera reserva</p></div></div>
+        </div></div></section>`;
     await window.cargarMenuPrevio();
 };
 
@@ -97,22 +74,22 @@ window.cargarMenuPrevio = async () => {
     });
 };
 
-// --- AUTENTICACIÓN ---
+// --- AUTH ---
 window.verificarPersonal = () => {
-    const pass = prompt("Contraseña de Seguridad:");
+    const pass = prompt("Contraseña Staff:");
     if (pass === "Oraculo Del Sabor") window.showAuth(true);
-    else alert("Acceso restringido.");
+    else alert("Acceso denegado");
 };
 
 window.showAuth = (esPersonal = false) => {
     document.getElementById('main-content').innerHTML = `
         <div id="inicio" class="container my-5 pt-5"><div class="row justify-content-center"><div class="col-md-5">
             <div class="glass-card" id="auth-box">
-                <h3 class="text-center mb-4 text-gold">${esPersonal ? 'Acceso Staff' : 'Área de Clientes'}</h3>
+                <h3 class="text-center mb-4 text-gold">${esPersonal ? 'Acceso Staff' : 'Clientes'}</h3>
                 <input id="auth-e" class="form-control mb-2" placeholder="Correo">
                 <input id="auth-p" type="password" class="form-control mb-3" placeholder="Contraseña">
-                <button onclick="window.handleLogin()" class="btn btn-primary w-100 mb-2">Iniciar Sesión</button>
-                ${!esPersonal ? '<button onclick="window.showRegister()" class="btn btn-outline-gold w-100 btn-sm">Crear una Cuenta</button>' : ''}
+                <button onclick="window.handleLogin()" class="btn btn-primary w-100 mb-2">Entrar</button>
+                ${!esPersonal ? '<button onclick="window.showRegister()" class="btn btn-outline-gold w-100 btn-sm">Crear Cuenta</button>' : ''}
             </div>
         </div></div></div>`;
 };
@@ -120,16 +97,16 @@ window.showAuth = (esPersonal = false) => {
 window.handleLogin = async () => {
     const e = document.getElementById('auth-e').value;
     const p = document.getElementById('auth-p').value;
-    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Credenciales inválidas"); }
+    try { await signInWithEmailAndPassword(auth, e, p); } catch { alert("Error de acceso"); }
 };
 
 window.showRegister = () => {
     document.getElementById('auth-box').innerHTML = `
-        <h3 class="text-center mb-4 text-gold">Nuevo Registro</h3>
-        <input id="reg-n" class="form-control mb-2" placeholder="Nombre y Apellido">
-        <input id="reg-e" class="form-control mb-2" placeholder="Correo electrónico">
+        <h3 class="text-center mb-4 text-gold">Registro</h3>
+        <input id="reg-n" class="form-control mb-2" placeholder="Nombre Completo">
+        <input id="reg-e" class="form-control mb-2" placeholder="Correo">
         <input id="reg-p" type="password" class="form-control mb-3" placeholder="Contraseña">
-        <button onclick="window.handleRegister()" class="btn btn-primary w-100">Registrarse</button>`;
+        <button onclick="window.handleRegister()" class="btn btn-primary w-100">Registrarme</button>`;
 };
 
 window.handleRegister = async () => {
@@ -142,7 +119,7 @@ window.handleRegister = async () => {
     } catch (err) { alert(err.message); }
 };
 
-// --- ÁREA CLIENTE ---
+// --- CLIENTE ---
 window.renderReservaCliente = async () => {
     document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
         <div id="inicio"></div>
@@ -150,25 +127,28 @@ window.renderReservaCliente = async () => {
             <div class="row g-4">
                 <div class="col-lg-7">
                     <div class="glass-card text-center">
-                        <h2 class="mb-4 text-gold">Configurar Reserva</h2>
-                        <div class="row text-start">
-                            <div class="col-md-6 mb-3"><label class="small text-white-50">Fecha de visita:</label><input id="res-f" type="date" class="form-control" min="${new Date().toISOString().split('T')[0]}"></div>
-                            <div class="col-md-6 mb-3"><label class="small text-white-50">Horario:</label><select id="res-h" class="form-select"><option>14:00</option><option>17:00</option><option>20:00</option></select></div>
-                            <div class="col-12 mb-4"><label class="small text-white-50">¿Cuántas personas?</label><input id="res-p" type="number" class="form-control" value="2" min="1"></div>
-                        </div>
-                        <h5 class="mb-3 text-white-50 small">Selecciona tu mesa disponible:</h5>
+                        <h2 class="mb-4 text-gold">Reservar Mesa</h2>
+                        <input id="res-f" type="date" class="form-control mb-3" min="${new Date().toISOString().split('T')[0]}">
+                        <select id="res-h" class="form-select mb-3"><option>14:00</option><option>17:00</option><option>20:00</option></select>
+                        <input id="res-p" type="number" class="form-control mb-4" placeholder="Personas" value="2">
                         <div id="grid-reserva" class="grid-mesas mb-4"></div>
-                        <button id="btn-confirmar-res" class="btn btn-primary btn-lg w-100 d-none" onclick="window.saveReserva()">CONFIRMAR MI RESERVACIÓN</button>
+                        <button id="btn-confirmar-res" class="btn btn-primary w-100 d-none" onclick="window.saveReserva()">CONFIRMAR RESERVA</button>
                     </div>
                 </div>
                 <div class="col-lg-5">
                     <div class="glass-card">
-                        <h4 class="text-gold mb-3 text-center">Mi Actividad</h4>
+                        <h4 class="text-gold mb-3 text-center">Mis Reservas</h4>
                         <div id="lista-historial"></div>
                     </div>
                 </div>
             </div>
-        </div>`;
+        </div>
+        <div class="modal fade" id="modalTicket" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-white text-dark"><div class="modal-body text-center p-4">
+            <h4 class="fw-bold">RESERVACIÓN EXITOSA</h4><hr>
+            <div id="ticket-info"></div><hr>
+            <p class="text-danger fw-bold small">¡TOMA CAPTURA DE PANTALLA!</p>
+            <button class="btn btn-dark w-100 no-print" onclick="window.print()">IMPRIMIR TICKET</button>
+        </div></div></div></div>`;
 
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
         const grid = document.getElementById('grid-reserva');
@@ -187,18 +167,14 @@ window.renderReservaCliente = async () => {
     onSnapshot(q, (snap) => {
         const container = document.getElementById('lista-historial');
         if(!container) return; container.innerHTML = "";
-        if(snap.empty) container.innerHTML = "<p class='text-center text-white-50 py-4'>No tienes historial registrado.</p>";
         snap.forEach(d => {
             const r = d.data();
-            const idH = d.id;
-            const statusLabel = r.estado === "vencida" ? "CANCELADA / VENCIDA" : r.estado.toUpperCase();
-            container.innerHTML += `
-            <div class="historial-item">
+            container.innerHTML += `<div class="historial-item">
                 <div class="d-flex justify-content-between align-items-center">
-                    <div><b class="text-gold">Mesa ${r.mesa}</b><br><small class="text-white-50">${r.fecha} | ${r.hora}</small></div>
-                    <span class="status-${r.estado}">${statusLabel}</span>
+                    <div><b>Mesa ${r.mesa}</b><br><small class="text-white-50">${r.fecha} | ${r.hora}</small></div>
+                    <span class="status-${r.estado}">${r.estado.toUpperCase()}</span>
                 </div>
-                ${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${idH}', '${r.mesa}')">Cancelar Reservación</button>` : ""}
+                ${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${d.id}', '${r.mesa}')">Cancelar</button>` : ""}
             </div>`;
         });
     });
@@ -208,37 +184,39 @@ window.saveReserva = async () => {
     const f = document.getElementById('res-f').value;
     const h = document.getElementById('res-h').value;
     const p = document.getElementById('res-p').value;
-    if(!f) return alert("Por favor elige una fecha");
+    if(!f) return alert("Selecciona fecha");
     const data = { cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, mesa: mesaActiva, estado: "confirmada", productos: [], total: 0 };
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), data);
     await addDoc(collection(db, "historial_reservas"), data);
-    alert("¡Tu mesa ha sido reservada con éxito!");
+    
+    // Mostrar ticket
+    document.getElementById('ticket-info').innerHTML = `<h3>MESA ${mesaActiva}</h3><p><b>Fecha:</b> ${f}<br><b>Hora:</b> ${h}</p><p>${p} Personas</p>`;
+    new bootstrap.Modal('#modalTicket').show();
 };
 
 window.cancelarReserva = async (idH, idM) => {
-    if(confirm("¿Estás seguro de que deseas cancelar?")) {
+    if(confirm("¿Cancelar reservación?")) {
         await updateDoc(doc(db, "historial_reservas", idH), { estado: "vencida" });
         await deleteDoc(doc(db, "mesas_activas", idM));
-        alert("Reservación cancelada.");
     }
 };
 
-// --- ÁREA STAFF (MESERO) ---
+// --- MESERO ---
 window.renderMesero = () => {
     document.getElementById('main-content').innerHTML = `
         <div id="inicio"></div>
         <div class="container my-5">
-            <h2 class="text-center mb-4 text-gold">Atención de Comensales</h2>
+            <h2 class="text-center mb-4 text-gold">Atención de Mesas</h2>
             <div class="row">
-                <div class="col-md-4"><div class="glass-card"><h4>Mapa de Mesas</h4><div id="grid-mesas-m" class="grid-mesas"></div></div></div>
+                <div class="col-md-4"><div class="glass-card"><h4>Mapa</h4><div id="grid-mesas-m" class="grid-mesas"></div></div></div>
                 <div id="area-atencion" class="col-md-8 d-none">
                     <div class="glass-card">
-                        <h3 class="text-center">Atendiendo Mesa: <span id="m-atend" class="text-gold">--</span></h3>
+                        <h3 class="text-center">Mesa: <span id="m-atend" class="text-gold">--</span></h3>
                         <p class="text-center text-white-50">Mesero: ${nombreUsuarioActual}</p>
-                        <select id="select-platillo" class="form-select mb-3" onchange="window.abrirModalCantidad(this.value)"><option value="" disabled selected>Agregar producto al pedido...</option></select>
+                        <select id="select-platillo" class="form-select mb-3" onchange="window.abrirModalCantidad(this.value)"><option value="" disabled selected>Agregar producto...</option></select>
                         <div id="lista-pedido" class="mb-4"></div>
-                        <h4 class="text-end text-gold">A Pagar: $<span id="total-atencion">0</span></h4>
-                        <button class="btn btn-primary btn-lg w-100" onclick="window.generarTicketFinal()">CERRAR CUENTA Y TICKET</button>
+                        <h4 class="text-end text-gold">Total: $<span id="total-atencion">0</span></h4>
+                        <button class="btn btn-primary w-100" onclick="window.generarTicketFinal()">GENERAR TICKET Y COBRAR</button>
                     </div>
                 </div>
             </div>
@@ -250,7 +228,7 @@ window.renderMesero = () => {
                 <h2 id="p-cant-modal">1</h2>
                 <button class="btn btn-outline-gold" onclick="window.modCant(1)">+</button>
             </div>
-            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AGREGAR AL PEDIDO</button>
+            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AÑADIR</button>
         </div></div></div></div>`;
     
     getDocs(collection(db, "menu")).then(snap => {
@@ -275,7 +253,7 @@ window.renderMesero = () => {
 window.atenderMesa = async (id, data) => {
     mesaActiva = id;
     if(!data) {
-        const pers = prompt(`Abrir Mesa ${id}: ¿Cuántas personas?`, "2");
+        const pers = prompt(`Comensales Mesa ${id}:`, "2");
         if(!pers) return;
         data = { cliente: "Presencial", mesero_asignado: auth.currentUser.email, mesero_nombre: nombreUsuarioActual, personas: pers, productos: [], total: 0 };
         await setDoc(doc(db, "mesas_activas", id.toString()), data);
@@ -315,22 +293,20 @@ window.generarTicketFinal = async () => {
     const snapM = await getDoc(doc(db, "mesas_activas", mesaActiva.toString()));
     const dataM = snapM.data();
 
-    // Actualizar estados de reservación si existían
+    // Finalizar en historial
     const qH = query(collection(db, "historial_reservas"), where("mesa", "==", mesaActiva), where("estado", "==", "confirmada"));
     const hSnap = await getDocs(qH);
     hSnap.forEach(async d => await updateDoc(doc(db, "historial_reservas", d.id), { estado: "finalizada" }));
 
-    // Guardar venta para el reporte del gerente
     await addDoc(collection(db, "ventas_finalizadas"), { ...dataM, mesa: mesaActiva, total: parseInt(total), fecha_venta: new Date().toLocaleString() });
 
     document.getElementById('main-content').innerHTML = `
         <div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg" style="font-family: monospace; max-width: 350px;">
             <h4 class="text-center fw-bold">EL ORÁCULO DEL SABOR</h4><hr>
-            <p>MESA: ${mesaActiva}<br>ATENDIÓ: ${nombreUsuarioActual}</p><hr>
+            <p>MESA: ${mesaActiva}<br>MESERO: ${nombreUsuarioActual}</p><hr>
             <div id="items-ticket"></div><hr>
             <h4 class="d-flex justify-content-between"><span>TOTAL:</span> <span>$${total}</span></h4><hr>
-            <p class="text-center small">¡Gracias por su visita!</p>
-            <button class="btn btn-dark w-100 no-print mt-3" onclick="window.finalizarCobro()">LIMPIAR MESA / FINALIZAR</button>
+            <button class="btn btn-dark w-100 no-print" onclick="window.finalizarCobro()">PAGADO</button>
         </div>`;
     pedidoLocal.forEach(p => { document.getElementById('items-ticket').innerHTML += `<div class="d-flex justify-content-between"><span>${p.cantidad} ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
 };
@@ -340,30 +316,6 @@ window.finalizarCobro = async () => {
     window.renderMesero();
 };
 
-// --- PANEL GERENTE ---
-window.renderGerente = async () => {
-    document.getElementById('main-content').innerHTML = `
-        <div id="inicio"></div>
-        <div class="container my-5">
-            <h2 class="mb-4 text-gold">Control Administrativo</h2>
-            <div class="row g-4 mb-5">
-                <div class="col-md-4"><div class="glass-card text-center"><h5>Ingresos Totales</h5><h2 id="total-ventas" class="text-gold">$0</h2></div></div>
-                <div class="col-md-8"><div class="glass-card"><h5>Últimas Ventas</h5><div id="reporte-ventas" style="max-height:250px; overflow-y:auto;"></div></div></div>
-            </div>
-            <div class="row g-4">
-                <div class="col-md-6"><div class="glass-card"><h4>Registrar Staff</h4><input id="m-nom" class="form-control mb-2" placeholder="Nombre"><input id="m-ema" class="form-control mb-2" placeholder="Correo"><input id="m-pas" type="password" class="form-control mb-3" placeholder="Contraseña"><button onclick="window.registrarMesero()" class="btn btn-primary w-100">DAR DE ALTA</button></div></div>
-                <div class="col-md-6"><div class="glass-card"><h4>Gestión Menú</h4><input id="p-nom" class="form-control mb-2" placeholder="Nombre Platillo"><input id="p-pre" type="number" class="form-control mb-2" placeholder="Precio"><input id="p-img" class="form-control mb-3" placeholder="URL de Imagen"><button onclick="window.agregarPlatillo()" class="btn btn-primary w-100">SUBIR PRODUCTO</button></div></div>
-            </div>
-        </div>`;
-    const snap = await getDocs(collection(db, "ventas_finalizadas"));
-    let sum = 0;
-    snap.forEach(d => {
-        const v = d.data(); sum += v.total;
-        document.getElementById('reporte-ventas').innerHTML += `<div class="border-bottom py-2 small"><b>Mesa ${v.mesa}</b> - $${v.total} | ${v.mesero_nombre}</div>`;
-    });
-    document.getElementById('total-ventas').innerText = `$${sum}`;
-};
-
 // --- OBSERVER ---
 onAuthStateChanged(auth, async (u) => {
     if(u) {
@@ -371,7 +323,11 @@ onAuthStateChanged(auth, async (u) => {
         const user = d.data();
         nombreUsuarioActual = user.nombre;
         document.getElementById('btn-logout').classList.remove('d-none');
-        if(user.rol === 'gerente') window.renderGerente();
+        if(user.rol === 'gerente') {
+             // Render Gerente simple
+             document.getElementById('main-content').innerHTML = `<div id="inicio"></div><div class="container my-5"><h2 class="text-gold">Panel Gerente</h2><p>Cargando datos...</p></div>`;
+             // (Aquí podrías llamar a renderGerente() si lo necesitas)
+        }
         else if(user.rol === 'mesero') window.renderMesero();
         else window.renderReservaCliente();
     } else {
