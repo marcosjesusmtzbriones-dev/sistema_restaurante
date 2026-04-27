@@ -42,28 +42,38 @@ const ESTILOS_GLOBALES = `
     input, select, textarea { background: rgba(10, 17, 24, 0.9) !important; color: white !important; border: 1px solid var(--gold) !important; }
     .historial-item { border-left: 4px solid var(--gold); background: rgba(255,255,255,0.08); margin-bottom: 12px; padding: 15px; }
     .status-confirmada { color: var(--gold); }
+    .status-vencida { color: #ff6b6b; }
     .grid-mesas { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
     .m-btn { aspect-ratio: 1; border: 1px solid var(--gold); color: white; transition: 0.3s; }
     .m-btn.ocupada { background: #ff6b6b; border: none; opacity: 0.6; }
     .m-btn.seleccionada { background: var(--gold); color: black; }
     .m-btn.atendida { background: #51cf66; border: none; }
-    #ticket-descarga { padding: 40px; background: white; color: black; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+    #ticket-descarga { padding: 40px; background: white; color: black; font-family: 'Segoe UI', sans-serif; }
 </style>`;
+
+window.scrollToSection = (id) => {
+    const el = document.getElementById(id);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+};
 
 window.descargarTicket = () => {
     const elemento = document.getElementById('ticket-descarga');
-    const opt = {
-        margin: 0.5,
-        filename: 'Ticket-Reserva-Oraculo.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 3 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
+    const opt = { margin: 0.5, filename: 'Ticket-Reserva-Oraculo.pdf', image: { type: 'jpeg', quality: 0.98 }, html2canvas: { scale: 3 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' } };
     html2pdf().set(opt).from(elemento).save();
 };
 
 window.renderLanding = async () => {
     document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top border-bottom border-warning">
+            <div class="container">
+                <a class="navbar-brand text-gold fw-bold" href="#">EL ORÁCULO</a>
+                <div class="navbar-nav ms-auto flex-row gap-3">
+                    <a class="nav-link" href="javascript:void(0)" onclick="window.scrollToSection('menu-section')">Menú</a>
+                    <a class="nav-link" href="javascript:void(0)" onclick="window.scrollToSection('promos-section')">Promos</a>
+                    <a class="nav-link" href="javascript:void(0)" onclick="window.scrollToSection('ubicacion-section')">Ubicación</a>
+                </div>
+            </div>
+        </nav>
         <section id="inicio" class="hero-section text-center">
             <div class="container">
                 <h1 class="display-2 fw-bold mb-3">El Oráculo <span class="text-gold">del Sabor</span></h1>
@@ -74,11 +84,18 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
-        <section id="menu-section" class="container py-5"><h2 class="text-center mb-5 text-gold display-4">Nuestro Menú</h2><div id="menu-previo" class="row g-4"></div></section>
+        <section id="menu-section" class="container py-5 mt-5"><h2 class="text-center mb-5 text-gold display-4">Nuestro Menú</h2><div id="menu-previo" class="row g-4"></div></section>
+        <section id="promos-section" class="container py-5">
+            <h2 class="text-center mb-5 text-gold display-4">Promociones del Olimpo</h2>
+            <div class="row g-4">
+                <div class="col-md-6"><div class="glass-card"><h3 class="text-gold">2x1 en Gyros</h3><p>Todos los jueves en Multiplaza Aragón.</p><span class="badge bg-primary">Jueves Heroicos</span></div></div>
+                <div class="col-md-6"><div class="glass-card"><h3 class="text-gold">Postre Gratis</h3><p>Baklava cortesía en tu primera reservación web.</p><span class="badge bg-primary">Exclusivo Web</span></div></div>
+            </div>
+        </section>
         <section id="ubicacion-section" class="container py-5 text-center">
             <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec de Morelos</p>
             <div class="glass-card p-0 overflow-hidden" style="height: 450px;">
-                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.366299104044!2d-99.0298453!3d19.5258359!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1f0b07b06b6b7%3A0x6335955a15336d3!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714180000000" allowfullscreen="" loading="lazy"></iframe>
+                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.334469796856!2d-99.03366052511475!3d19.527263537233765!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb073d881e17%3A0x6b77c15682855110!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714180000000!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
     await window.cargarMenuPrevio();
@@ -90,7 +107,7 @@ window.cargarMenuPrevio = async () => {
     if(!container) return; container.innerHTML = "";
     snap.forEach(doc => {
         const p = doc.data();
-        container.innerHTML += `<div class="col-md-4"><div class="glass-card text-center h-100"><img src="${p.imagen}" onerror="this.src='https://placehold.co/400x300/0a1118/c5a059?text=Oráculo+Griego'" class="img-fluid rounded mb-3" style="height:200px; width:100%; object-fit:cover;"><h4 class="text-gold">${p.nombre}</h4><p class="small text-white-50"><i>${p.descripcion}</i></p><h5 class="fw-bold">$${p.precio}</h5></div></div>`;
+        container.innerHTML += `<div class="col-md-4"><div class="glass-card text-center h-100"><img src="${p.imagen}" onerror="this.src='https://placehold.co/400x300/0a1118/c5a059?text=Menu'" class="img-fluid rounded mb-3" style="height:200px; width:100%; object-fit:cover;"><h4 class="text-gold">${p.nombre}</h4><p class="small text-white-50"><i>${p.descripcion}</i></p><h5 class="fw-bold">$${p.precio}</h5></div></div>`;
     });
 };
 
@@ -192,15 +209,30 @@ window.renderReservaCliente = async () => {
         if(!container) return; container.innerHTML = "";
         snap.forEach(d => {
             const r = d.data();
-            container.innerHTML += `<div class="historial-item"><div class="d-flex justify-content-between"><div><b>Mesa ${r.mesa}-${r.fecha} | ${r.hora}</b><br><small>${r.personas} Personas</small></div><span class="status-${r.estado}">${r.estado}</span></div></div>`;
+            container.innerHTML += `
+                <div class="historial-item">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div><b>Mesa ${r.mesa}-${r.fecha} | ${r.hora}</b><br><small>${r.personas} Personas</small></div>
+                        <span class="status-${r.estado}">${r.estado}</span>
+                    </div>
+                    ${r.estado === "confirmada" ? `<button class="btn btn-sm btn-outline-danger w-100 mt-2" onclick="window.cancelarReserva('${d.id}', '${r.mesa}')">Cancelar Reserva</button>` : ""}
+                </div>`;
         });
     });
+};
+
+window.cancelarReserva = async (idH, idM) => {
+    if(confirm("¿Seguro que deseas cancelar esta reserva?")) {
+        await updateDoc(doc(db, "historial_reservas", idH), { estado: "vencida" });
+        await deleteDoc(doc(db, "mesas_activas", idM));
+    }
 };
 
 window.saveReserva = async () => {
     const f = document.getElementById('res-f').value;
     const h = document.getElementById('res-h').value;
     const p = document.getElementById('res-p').value;
+    if(!f || !h) return alert("Selecciona fecha y hora");
     const data = { cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, mesa: mesaActiva, estado: "confirmada", productos: [], total: 0 };
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), data);
     await addDoc(collection(db, "historial_reservas"), data);
@@ -339,4 +371,3 @@ onAuthStateChanged(auth, async (u) => {
 });
 
 document.getElementById('btn-logout').onclick = () => signOut(auth);
-
