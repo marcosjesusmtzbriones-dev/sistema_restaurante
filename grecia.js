@@ -68,35 +68,15 @@ window.scrollToSection = (id) => {
 };
 
 window.descargarTicket = () => {
-    const info = document.getElementById('ticket-info').innerHTML;
-    
-    // Crear un contenedor temporal fuera del DOM visible para asegurar la renderización
-    const content = document.createElement('div');
-    content.style.padding = "40px";
-    content.style.background = "white";
-    content.style.color = "black";
-    content.style.width = "400px";
-    content.innerHTML = `
-        <div style="text-align: center; font-family: sans-serif;">
-            <h2 style="margin-bottom: 5px;">EL ORÁCULO DEL SABOR</h2>
-            <p style="font-size: 12px;">Multiplaza Aragón, Ecatepec</p>
-            <hr style="border: 1px solid #000;">
-            <h3 style="margin: 20px 0;">TICKET DE RESERVA</h3>
-            <div style="font-size: 16px; line-height: 1.6;">${info}</div>
-            <hr style="border: 1px solid #000; margin-top: 20px;">
-            <p style="font-weight: bold; color: #dc3545;">¡RECUERDA PRESENTAR ESTE TICKET!</p>
-        </div>
-    `;
-
+    const elemento = document.getElementById('ticket-descarga');
     const opt = {
-        margin: 1,
+        margin: 0.5,
         filename: 'Ticket-Reserva-Oraculo.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, logging: false, useCORS: true },
+        html2canvas: { scale: 3 },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-
-    html2pdf().set(opt).from(content).save();
+    html2pdf().set(opt).from(elemento).save();
 };
 
 window.renderLanding = async () => {
@@ -121,7 +101,7 @@ window.renderLanding = async () => {
         </section>
         <section id="ubicacion-section" class="container py-5 text-center">
             <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec</p>
-            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.3642352873153!2d-99.0287114247833!3d19.5258908817743!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb1b608d0e7d%3A0xc3f92d4756578762!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714249110000!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe></div>
+            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="https://maps.google.com/maps?q=Multiplaza%20Aragon,%20Ecatepec&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe></div>
         </section>`;
     await window.cargarMenuPrevio();
 };
@@ -198,12 +178,14 @@ window.renderReservaCliente = async () => {
         <div class="modal fade" id="modalTicket" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-white text-dark p-0 border-0 shadow-lg">
-                    <div id="ticket-visual" style="padding: 40px 30px; background: white; text-align: center;">
-                        <h4 class="fw-bold mb-3" style="color: black;">TICKET DE RESERVA</h4>
-                        <hr style="border-top: 1px solid #999; opacity: 1;">
-                        <div id="ticket-info"></div>
-                        <hr style="border-top: 1px solid #999; opacity: 1;">
-                        <h6 class="fw-bold mt-3" style="color: #dc3545;">¡TOMA CAPTURA DE PANTALLA!</h6>
+                    <div id="ticket-descarga" style="padding: 40px 30px; background: white; text-align: center;">
+                        <div class="text-center">
+                            <h4 class="fw-bold mb-3" style="color: black;">TICKET DE RESERVA</h4>
+                            <hr style="border-top: 1px solid #999; opacity: 1;">
+                            <div id="ticket-info"></div>
+                            <hr style="border-top: 1px solid #999; opacity: 1;">
+                            <h6 class="fw-bold mt-3" style="color: #dc3545;">¡TOMA CAPTURA DE PANTALLA!</h6>
+                        </div>
                     </div>
                     <div class="p-3 bg-light d-flex gap-2">
                         <button class="btn btn-primary w-100" onclick="window.descargarTicket()">DESCARGAR PDF</button>
@@ -248,8 +230,8 @@ window.saveReserva = async () => {
     
     document.getElementById('ticket-info').innerHTML = `
         <h3 class="fw-bold mt-3 mb-2" style="color: black;">Mesa ${mesaActiva}</h3>
-        <p class="mb-2" style="color: black; font-size: 16px;"><b>Fecha:</b> ${f} <br> <b>Hora:</b> ${h}</p>
-        <p class="mb-3" style="color: black; font-size: 15px;"><b>Comensales:</b> ${p}</p>
+        <p class="mb-2" style="color: black; font-size: 16px;">${f} - ${h}</p>
+        <p class="mb-3" style="color: black; font-size: 15px;">${p} Personas</p>
     `;
     new bootstrap.Modal('#modalTicket').show();
 };
