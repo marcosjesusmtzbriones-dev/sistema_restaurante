@@ -34,7 +34,6 @@ const ESTILOS_GLOBALES = `
     @media print { .no-print { display: none !important; } .modal-backdrop { display: none !important; } }
 </style>`;
 
-// --- NAVEGACIÓN ---
 window.scrollToSection = (id) => {
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: 'smooth' });
@@ -54,12 +53,10 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
-        
         <section id="menu-section" class="container my-5">
             <h2 class="text-center mb-5 text-gold">Nuestro Menú</h2>
             <div id="menu-previo" class="row g-4"></div>
         </section>
-
         <section id="promos-section" class="py-5 bg-greek-dark">
             <div class="container text-center">
                 <h2 class="mb-5 text-gold">Promociones del Olimpo</h2>
@@ -70,14 +67,11 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
-
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4 text-gold">Ubicación</h2>
             <p class="text-white-50">Visítanos en Multiplaza Aragón, Ecatepec</p>
             <div class="glass-card p-0 overflow-hidden" style="height: 400px;">
-                <iframe width="100%" height="100%" style="border:0;" 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.334460980516!2d-99.03154842426993!3d19.527376781772643!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3540c1d634283893%3A0xc3b86940866504a4!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses!2smx!4v1714100000000!5m2!1ses!2smx" 
-                    allowfullscreen="" loading="lazy"></iframe>
+                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.3667232230756!2d-99.0294371!3d19.525893!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb1f478546b3%3A0x67398a87b03b2907!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses!2smx!4v1713000000000" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
     await window.cargarMenuPrevio();
@@ -94,7 +88,6 @@ window.cargarMenuPrevio = async () => {
     });
 };
 
-// --- AUTH ---
 window.verificarPersonal = () => {
     const pass = prompt("Contraseña Staff:");
     if (pass === "Oraculo Del Sabor") window.showAuth(true);
@@ -139,7 +132,6 @@ window.handleRegister = async () => {
     } catch (err) { alert(err.message); }
 };
 
-// --- CLIENTE ---
 window.renderReservaCliente = async () => {
     document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
         <div id="inicio"></div>
@@ -208,7 +200,6 @@ window.saveReserva = async () => {
     const data = { cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, mesa: mesaActiva, estado: "confirmada", productos: [], total: 0 };
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), data);
     await addDoc(collection(db, "historial_reservas"), data);
-    
     document.getElementById('ticket-info').innerHTML = `<h3>MESA ${mesaActiva}</h3><p>${f} | ${h}</p><p>${p} Personas</p>`;
     new bootstrap.Modal('#modalTicket').show();
 };
@@ -220,7 +211,67 @@ window.cancelarReserva = async (idH, idM) => {
     }
 };
 
-// --- STAFF ---
+window.renderGerente = () => {
+    document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
+        <div id="inicio"></div>
+        <div class="container my-5">
+            <h2 class="text-gold text-center mb-4">Panel de Gerencia</h2>
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="glass-card">
+                        <h4 class="mb-3">Agregar Nuevo Item al Menú</h4>
+                        <label class="small text-white-50">Categoría</label>
+                        <select id="p-categoria" class="form-select mb-3">
+                            <option value="bebida">Bebida</option>
+                            <option value="entrada">Entrada</option>
+                            <option value="plato_fuerte">Plato Fuerte</option>
+                            <option value="postre">Postre</option>
+                        </select>
+                        <input id="p-nombre" class="form-control mb-2" placeholder="Nombre del producto">
+                        <input id="p-precio" type="number" class="form-control mb-2" placeholder="Precio ($)">
+                        <input id="p-img" class="form-control mb-3" placeholder="URL de la imagen">
+                        <button onclick="window.guardarProducto()" class="btn btn-primary w-100">GUARDAR PRODUCTO</button>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-5">
+                <h4 class="text-gold mb-3">Menú Actual</h4>
+                <div id="lista-menu-gerente" class="row g-3"></div>
+            </div>
+        </div>`;
+    window.cargarMenuRevision();
+};
+
+window.guardarProducto = async () => {
+    const cat = document.getElementById('p-categoria').value;
+    const nom = document.getElementById('p-nombre').value;
+    const pre = document.getElementById('p-precio').value;
+    const img = document.getElementById('p-img').value;
+    if (!nom || !pre || !img) return alert("Por favor, rellena todos los campos");
+    try {
+        await addDoc(collection(db, "menu"), { nombre: nom, precio: parseInt(pre), categoria: cat, imagen: img });
+        alert("¡Producto agregado con éxito!");
+        window.renderGerente();
+    } catch (e) { alert("Error al guardar"); }
+};
+
+window.cargarMenuRevision = async () => {
+    const snap = await getDocs(collection(db, "menu"));
+    const container = document.getElementById('lista-menu-gerente');
+    if(!container) return; container.innerHTML = "";
+    snap.forEach(doc => {
+        const p = doc.data();
+        container.innerHTML += `
+            <div class="col-md-3">
+                <div class="glass-card text-center p-2 small">
+                    <img src="${p.imagen}" class="rounded mb-2" style="height:80px; width:100%; object-fit:cover;">
+                    <p class="mb-0"><b>${p.nombre}</b></p>
+                    <span class="text-gold">$${p.precio}</span> | <span class="badge bg-dark">${p.categoria}</span>
+                </div>
+            </div>`;
+    });
+};
+
 window.renderMesero = () => {
     document.getElementById('main-content').innerHTML = `
         <div id="inicio"></div>
@@ -249,12 +300,10 @@ window.renderMesero = () => {
             </div>
             <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AÑADIR</button>
         </div></div></div></div>`;
-    
     getDocs(collection(db, "menu")).then(snap => {
         const sel = document.getElementById('select-platillo');
         snap.forEach(d => { const p = d.data(); const opt = document.createElement('option'); opt.value = JSON.stringify({nombre: p.nombre, precio: p.precio}); opt.innerText = `${p.nombre} - $${p.precio}`; sel.appendChild(opt); });
     });
-
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
         const grid = document.getElementById('grid-mesas-m');
         if(!grid) return; grid.innerHTML = "";
@@ -311,13 +360,10 @@ window.generarTicketFinal = async () => {
     const total = document.getElementById('total-atencion').innerText;
     const snapM = await getDoc(doc(db, "mesas_activas", mesaActiva.toString()));
     const dataM = snapM.data();
-
     const qH = query(collection(db, "historial_reservas"), where("mesa", "==", mesaActiva), where("estado", "==", "confirmada"));
     const hSnap = await getDocs(qH);
     hSnap.forEach(async d => await updateDoc(doc(db, "historial_reservas", d.id), { estado: "finalizada" }));
-
     await addDoc(collection(db, "ventas_finalizadas"), { ...dataM, mesa: mesaActiva, total: parseInt(total), fecha_venta: new Date().toLocaleString() });
-
     document.getElementById('main-content').innerHTML = `
         <div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg" style="font-family: monospace; max-width: 350px;">
             <h4 class="text-center fw-bold">EL ORÁCULO DEL SABOR</h4><hr>
@@ -334,16 +380,13 @@ window.finalizarCobro = async () => {
     window.renderMesero();
 };
 
-// --- OBSERVER ---
 onAuthStateChanged(auth, async (u) => {
     if(u) {
         const d = await getDoc(doc(db, "usuarios", u.uid));
         const user = d.data();
         nombreUsuarioActual = user.nombre;
         document.getElementById('btn-logout').classList.remove('d-none');
-        if(user.rol === 'gerente') {
-            document.getElementById('main-content').innerHTML = `<div id="inicio"></div><div class="container my-5"><h2 class="text-gold text-center">Panel Gerencia</h2></div>`;
-        }
+        if(user.rol === 'gerente') window.renderGerente();
         else if(user.rol === 'mesero') window.renderMesero();
         else window.renderReservaCliente();
     } else {
