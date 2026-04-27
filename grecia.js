@@ -31,7 +31,7 @@ const ESTILOS_GLOBALES = `
     .hero-section {
         background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), 
                     url('https://images.unsplash.com/photo-1533105079780-92b9be482077?q=80&w=2000&auto=format&fit=crop');
-        background-size: cover; background-position: center; height: 90vh; display: flex; align-items: center; justify-content: center; color: white;
+        background-size: cover; background-position: center; height: 100vh; display: flex; align-items: center; justify-content: center; color: white;
     }
     .text-gold { color: var(--gold) !important; }
     .btn-primary { background-color: var(--gold); border: none; color: black; font-weight: bold; }
@@ -64,27 +64,22 @@ window.descargarTicket = () => {
 
 window.renderLanding = async () => {
     document.getElementById('main-content').innerHTML = ESTILOS_GLOBALES + `
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top border-bottom border-warning">
-            <div class="container">
-                <a class="navbar-brand text-gold fw-bold" href="#">EL ORÁCULO</a>
-                <div class="navbar-nav ms-auto flex-row gap-3">
-                    <a class="nav-link" href="javascript:void(0)" onclick="window.scrollToSection('menu-section')">Menú</a>
-                    <a class="nav-link" href="javascript:void(0)" onclick="window.scrollToSection('promos-section')">Promos</a>
-                    <a class="nav-link" href="javascript:void(0)" onclick="window.scrollToSection('ubicacion-section')">Ubicación</a>
-                </div>
-            </div>
-        </nav>
         <section id="inicio" class="hero-section text-center">
             <div class="container">
                 <h1 class="display-2 fw-bold mb-3">El Oráculo <span class="text-gold">del Sabor</span></h1>
-                <p class="lead mb-5 fs-3">Auténtica Gastronomía Griega en Ecatepec</p>
+                <p class="lead mb-4 fs-3">Auténtica Gastronomía Griega en Ecatepec</p>
+                <div class="d-flex flex-wrap justify-content-center gap-3 mb-5">
+                    <button class="btn btn-outline-gold" onclick="window.scrollToSection('menu-section')">VER MENÚ</button>
+                    <button class="btn btn-outline-gold" onclick="window.scrollToSection('promos-section')">PROMOS</button>
+                    <button class="btn btn-outline-gold" onclick="window.scrollToSection('ubicacion-section')">UBICACIÓN</button>
+                </div>
                 <div class="d-flex justify-content-center gap-3">
                     <button class="btn btn-primary btn-lg px-5" onclick="window.showAuth()">RESERVAR AHORA</button>
                     <button class="btn btn-outline-gold btn-lg px-5" onclick="window.verificarPersonal()">ACCESO STAFF</button>
                 </div>
             </div>
         </section>
-        <section id="menu-section" class="container py-5 mt-5"><h2 class="text-center mb-5 text-gold display-4">Nuestro Menú</h2><div id="menu-previo" class="row g-4"></div></section>
+        <section id="menu-section" class="container py-5"><h2 class="text-center mb-5 text-gold display-4">Nuestro Menú</h2><div id="menu-previo" class="row g-4"></div></section>
         <section id="promos-section" class="container py-5">
             <h2 class="text-center mb-5 text-gold display-4">Promociones del Olimpo</h2>
             <div class="row g-4">
@@ -95,7 +90,7 @@ window.renderLanding = async () => {
         <section id="ubicacion-section" class="container py-5 text-center">
             <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec de Morelos</p>
             <div class="glass-card p-0 overflow-hidden" style="height: 450px;">
-                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3760.334469796856!2d-99.03366052511475!3d19.527263537233765!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb073d881e17%3A0x6b77c15682855110!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714180000000!5m2!1ses-419!2smx" allowfullscreen="" loading="lazy"></iframe>
+                <iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3759.123456789!2d-99.027!3d19.534!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDMyJzAyLjQiTiA5OcKwMDEnMzcuMiJX!5e0!3m2!1ses!2smx!4v1234567891" allowfullscreen="" loading="lazy"></iframe>
             </div>
         </section>`;
     await window.cargarMenuPrevio();
