@@ -68,15 +68,28 @@ window.scrollToSection = (id) => {
 };
 
 window.descargarTicket = () => {
-    const elemento = document.getElementById('ticket-descarga');
+    // Clonamos el elemento para evitar problemas de renderizado en modales
+    const original = document.getElementById('ticket-descarga');
+    const clon = original.cloneNode(true);
+    
+    // Lo hacemos visible pero fuera de la pantalla para la captura
+    clon.style.position = 'fixed';
+    clon.style.left = '-9999px';
+    clon.style.top = '0';
+    clon.style.width = '500px'; // Ancho fijo para asegurar el diseño
+    document.body.appendChild(clon);
+
     const opt = {
         margin: 0.5,
         filename: 'Ticket-Reserva-Oraculo.pdf',
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 3 },
+        html2canvas: { scale: 3, useCORS: true, logging: false },
         jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
     };
-    html2pdf().set(opt).from(elemento).save();
+
+    html2pdf().set(opt).from(clon).save().then(() => {
+        document.body.removeChild(clon);
+    });
 };
 
 window.renderLanding = async () => {
@@ -101,7 +114,7 @@ window.renderLanding = async () => {
         </section>
         <section id="ubicacion-section" class="container py-5 text-center">
             <h2 class="mb-4 text-gold">Encuéntranos</h2><p class="text-white-50">Multiplaza Aragón, Ecatepec</p>
-            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="https://maps.google.com/maps?q=Multiplaza%20Aragon,%20Ecatepec&t=&z=15&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy"></iframe></div>
+            <div class="glass-card p-0 overflow-hidden" style="height: 400px;"><iframe width="100%" height="100%" style="border:0;" src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m18!1m12!1m3!1d3760.354670072124!2d-99.0305!3d19.534!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x85d1fb1776595555%3A0x889816911c76a9a0!2sMultiplaza%20Arag%C3%B3n!5e0!3m2!1ses-419!2smx!4v1714200000000" allowfullscreen="" loading="lazy"></iframe></div>
         </section>`;
     await window.cargarMenuPrevio();
 };
@@ -178,13 +191,15 @@ window.renderReservaCliente = async () => {
         <div class="modal fade" id="modalTicket" tabindex="-1">
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content bg-white text-dark p-0 border-0 shadow-lg">
-                    <div id="ticket-descarga" style="padding: 40px 30px; background: white; text-align: center;">
-                        <div class="text-center">
-                            <h4 class="fw-bold mb-3" style="color: black;">TICKET DE RESERVA</h4>
-                            <hr style="border-top: 1px solid #999; opacity: 1;">
-                            <div id="ticket-info"></div>
-                            <hr style="border-top: 1px solid #999; opacity: 1;">
-                            <h6 class="fw-bold mt-3" style="color: #dc3545;">¡TOMA CAPTURA DE PANTALLA!</h6>
+                    <div id="ticket-descarga">
+                        <div class="text-center" style="padding: 20px;">
+                            <h5 class="fw-bold mb-1" style="color: #c5a059;">EL ORÁCULO DEL SABOR</h5>
+                            <small class="text-muted">Multiplaza Aragón, Ecatepec</small>
+                            <h4 class="fw-bold my-3" style="color: black; border-top: 2px solid #eee; border-bottom: 2px solid #eee; padding: 10px 0;">TICKET DE RESERVA</h4>
+                            <div id="ticket-info" class="py-2"></div>
+                            <hr style="border-top: 1px dashed #999; opacity: 1;">
+                            <h6 class="fw-bold mt-3" style="color: #dc3545;">¡PRESENTA ESTE TICKET AL LLEGAR!</h6>
+                            <p class="small text-muted mt-2">Valido solo para la fecha y hora indicada.</p>
                         </div>
                     </div>
                     <div class="p-3 bg-light d-flex gap-2">
@@ -230,8 +245,9 @@ window.saveReserva = async () => {
     
     document.getElementById('ticket-info').innerHTML = `
         <h3 class="fw-bold mt-3 mb-2" style="color: black;">Mesa ${mesaActiva}</h3>
-        <p class="mb-2" style="color: black; font-size: 16px;">${f} - ${h}</p>
-        <p class="mb-3" style="color: black; font-size: 15px;">${p} Personas</p>
+        <p class="mb-2" style="color: black; font-size: 18px;"><b>Fecha:</b> ${f}</p>
+        <p class="mb-2" style="color: black; font-size: 18px;"><b>Hora:</b> ${h}</p>
+        <p class="mb-3" style="color: black; font-size: 16px;"><b>Invitados:</b> ${p}</p>
     `;
     new bootstrap.Modal('#modalTicket').show();
 };
