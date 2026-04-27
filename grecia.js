@@ -37,10 +37,41 @@ window.renderLanding = async () => {
                 </div>
             </div>
         </section>
+
         <section id="menu-section" class="container my-5">
             <h2 class="text-center mb-4" style="color:#c5a059">Nuestro Menú</h2>
             <div id="menu-previo" class="row g-4"></div>
         </section>
+
+        <section id="promos-section" class="py-5 bg-greek-dark">
+            <div class="container text-center">
+                <h2 class="mb-5" style="color:#c5a059">Promociones del Olimpo</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="glass-card h-100 border-gold p-4">
+                            <h3 class="display-4" style="color:#c5a059">2x1</h3>
+                            <h4>Gyros Clásicos</h4>
+                            <p class="text-white-50">Todos los martes y jueves</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card h-100 border-gold p-4">
+                            <h3 class="display-4" style="color:#c5a059">15%</h3>
+                            <h4>Estudiantes</h4>
+                            <p class="text-white-50">Presentando credencial vigente</p>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="glass-card h-100 border-gold p-4">
+                            <h3 class="display-4" style="color:#c5a059">FREE</h3>
+                            <h4>Postre Baklava</h4>
+                            <p class="text-white-50">En tu primera reserva online</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="ubicacion-section" class="container my-5 text-center">
             <h2 class="mb-4" style="color:#c5a059">Ubicación</h2>
             <p class="text-white-50 mb-4">Multiplaza Aragón: Av. Central 120, Ecatepec de Morelos, Méx.</p>
@@ -134,12 +165,18 @@ window.renderReservaCliente = async () => {
                 </div>
                 <div class="col-lg-4">
                     <div class="glass-card h-100">
-                        <h4 style="color:#c5a059" class="mb-3">Mis Reservas</h4>
+                        <h4 style="color:#c5a059" class="mb-3">Mis Reservas Activas</h4>
                         <div id="lista-mis-reservas" class="text-start"></div>
                     </div>
                 </div>
             </div>
-        </div>`;
+        </div>
+        <div class="modal fade" id="modalTicket" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-light text-dark"><div class="modal-body text-center" id="ticket-captura">
+            <h4 class="fw-bold">RESERVACIÓN CONFIRMADA</h4><hr>
+            <div id="ticket-detalle" class="text-start mb-3"></div><hr>
+            <p class="small text-muted">Presenta este ticket al llegar.</p>
+            <button class="btn btn-dark w-100" data-bs-dismiss="modal">CERRAR</button>
+        </div></div></div></div>`;
 
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
         const grid = document.getElementById('grid-reserva');
@@ -190,7 +227,8 @@ window.saveReserva = async () => {
     await setDoc(doc(db, "mesas_activas", mesaActiva.toString()), { 
         cliente: auth.currentUser.email, fecha: f, hora: h, personas: p, estado: "reservada", productos: [], total: 0 
     });
-    alert("Reserva exitosa");
+    document.getElementById('ticket-detalle').innerHTML = `<p><b>Mesa:</b> ${mesaActiva}</p><p><b>Fecha:</b> ${f}</p><p><b>Hora:</b> ${h}</p><p><b>Personas:</b> ${p}</p>`;
+    new bootstrap.Modal('#modalTicket').show();
     mesaActiva = null;
 };
 
@@ -239,16 +277,27 @@ window.renderMesero = () => {
                         <h3 class="text-center">Mesa: <span id="m-atend" style="color:#c5a059">--</span></h3>
                         <p class="text-center text-white-50">Comensales: <span id="m-pers-atend">0</span></p>
                         <div class="mb-3">
-                            <select id="select-platillo" class="form-select" onchange="window.prepararPedido(this.value)">
-                                <option value="" selected disabled>Selecciona platillo...</option>
+                            <select id="select-platillo" class="form-select mb-2" onchange="window.abrirModalCantidad(this.value)">
+                                <option value="" selected disabled>Agregar platillo...</option>
                             </select>
                         </div>
                         <div id="lista-pedido" class="mb-3"></div>
-                        <button class="btn btn-primary w-100" onclick="window.generarTicket()">Ticket y Cerrar</button>
+                        <div class="d-flex justify-content-between mb-3 text-gold"><h4>Total:</h4><h4>$<span id="total-atencion">0</span></h4></div>
+                        <button class="btn btn-primary w-100" onclick="window.generarTicketFinal()">Generar Ticket y Cobrar</button>
                     </div>
                 </div>
             </div>
-        </div>`;
+        </div>
+        <div class="modal fade" id="modalCantidad" tabindex="-1"><div class="modal-dialog modal-dialog-centered"><div class="modal-content bg-dark text-white border-gold"><div class="modal-body text-center">
+            <h5 id="p-nombre-modal" class="mb-4"></h5>
+            <div class="d-flex justify-content-center align-items-center gap-4 mb-4">
+                <button class="btn btn-outline-gold" onclick="window.modCant(-1)">-</button>
+                <h2 id="p-cant-modal">1</h2>
+                <button class="btn btn-outline-gold" onclick="window.modCant(1)">+</button>
+            </div>
+            <button class="btn btn-primary w-100" onclick="window.confirmarProducto()">AGREGAR AL PEDIDO</button>
+        </div></div></div></div>`;
+    
     actualizarSelectProductos();
     onSnapshot(collection(db, "mesas_activas"), (snap) => {
         const grid = document.getElementById('grid-mesas-m');
@@ -281,11 +330,10 @@ window.atenderMesa = async (id, data) => {
     const miEmail = auth.currentUser.email;
     mesaActiva = id;
     if (data && data.mesero_asignado && data.mesero_asignado !== miEmail) {
-        alert(`Mesa ocupada por: ${data.mesero_asignado}`);
-        return;
+        alert(`Mesa ocupada por: ${data.mesero_asignado}`); return;
     }
     if(!data) {
-        const pers = prompt(`¿Para cuántas personas es la Mesa ${id}?`, "2");
+        const pers = prompt(`Mesa ${id} - ¿Cuántas personas?`, "2");
         if(pers === null) return;
         data = { cliente: "Presencial", mesero_asignado: miEmail, personas: pers, productos: [], total: 0 };
         await setDoc(doc(db, "mesas_activas", id.toString()), data);
@@ -299,23 +347,54 @@ window.atenderMesa = async (id, data) => {
     window.renderListaPedido();
 };
 
-window.prepararPedido = (val) => {
+window.abrirModalCantidad = (val) => {
     if(!val) return;
-    prodTemp = JSON.parse(val);
-    pedidoLocal.push({ nombre: prodTemp.nombre, cantidad: 1, subtotal: prodTemp.precio });
+    prodTemp = JSON.parse(val); cantTemp = 1;
+    document.getElementById('p-nombre-modal').innerText = prodTemp.nombre;
+    document.getElementById('p-cant-modal').innerText = cantTemp;
+    new bootstrap.Modal('#modalCantidad').show();
+};
+
+window.modCant = (v) => { cantTemp = Math.max(1, cantTemp + v); document.getElementById('p-cant-modal').innerText = cantTemp; };
+
+window.confirmarProducto = async () => {
+    pedidoLocal.push({ nombre: prodTemp.nombre, cantidad: cantTemp, subtotal: prodTemp.precio * cantTemp });
+    const total = pedidoLocal.reduce((acc, p) => acc + p.subtotal, 0);
+    await updateDoc(doc(db, "mesas_activas", mesaActiva.toString()), { productos: pedidoLocal, total: total });
+    bootstrap.Modal.getInstance('#modalCantidad').hide();
+    document.getElementById('select-platillo').value = "";
     window.renderListaPedido();
 };
 
 window.renderListaPedido = () => {
     const container = document.getElementById('lista-pedido');
     let total = 0; container.innerHTML = "";
-    pedidoLocal.forEach(p => { total += parseInt(p.subtotal); container.innerHTML += `<div class="d-flex justify-content-between border-bottom py-2"><span>${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
+    pedidoLocal.forEach(p => { 
+        total += p.subtotal; 
+        container.innerHTML += `<div class="d-flex justify-content-between border-bottom border-secondary py-2"><span>${p.cantidad}x ${p.nombre}</span><span>$${p.subtotal}</span></div>`; 
+    });
+    document.getElementById('total-atencion').innerText = total;
 };
 
-window.generarTicket = async () => {
+window.generarTicketFinal = () => {
+    const total = document.getElementById('total-atencion').innerText;
+    document.getElementById('main-content').innerHTML = `
+        <div class="p-4 bg-white text-dark mx-auto my-5 shadow-lg" style="font-family: monospace; max-width: 350px;">
+            <h4 class="text-center fw-bold">EL ORÁCULO DEL SABOR</h4>
+            <p class="text-center small">Multiplaza Aragón, Ecatepec</p><hr>
+            <p>MESA: ${mesaActiva} | COMENSALES: ${document.getElementById('m-pers-atend').innerText}</p><hr>
+            <div id="ticket-items"></div><hr>
+            <h4 class="d-flex justify-content-between"><span>TOTAL:</span> <span>$${total}</span></h4><hr>
+            <p class="text-center mt-4">¡Efjaristó por su visita!</p>
+            <button class="btn btn-dark w-100 mt-4 no-print" onclick="window.cerrarYLimpiarMesa()">PAGADO Y LIBERAR MESA</button>
+        </div>`;
+    const items = document.getElementById('ticket-items');
+    pedidoLocal.forEach(p => { items.innerHTML += `<div class="d-flex justify-content-between"><span>${p.cantidad} ${p.nombre}</span><span>$${p.subtotal}</span></div>`; });
+};
+
+window.cerrarYLimpiarMesa = async () => {
     await deleteDoc(doc(db, "mesas_activas", mesaActiva.toString()));
     mesaActiva = null; pedidoLocal = [];
-    alert("Ticket generado y mesa liberada");
     window.renderMesero();
 };
 
