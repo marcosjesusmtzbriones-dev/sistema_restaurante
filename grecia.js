@@ -2,10 +2,10 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/12.12.1/fireba
 import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-auth.js";
 import { getFirestore, doc, getDoc, setDoc, collection, addDoc, getDocs, onSnapshot, deleteDoc, updateDoc, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.12.1/firebase-firestore.js";
 
-// Librería para PDF
-const scriptPdf = document.createElement('script');
-scriptPdf.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-document.head.appendChild(scriptPdf);
+// Librería para IMAGEN (sustituye a PDF)
+const scriptImg = document.createElement('script');
+scriptImg.src = "https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js";
+document.head.appendChild(scriptImg);
 
 const firebaseConfig = {
     apiKey: "AIzaSyDPuAu5691El4Xbh-ap59FsRAgdNWRy5c0",
@@ -67,16 +67,18 @@ window.scrollToSection = (id) => {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
 };
 
+// Nueva función para descargar como IMAGEN (PNG)
 window.descargarTicket = () => {
     const elemento = document.getElementById('ticket-descarga');
-    const opt = {
-        margin: 0.5,
-        filename: 'Ticket-Reserva-Oraculo.pdf',
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 3 },
-        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-    };
-    html2pdf().set(opt).from(elemento).save();
+    html2canvas(elemento, {
+        backgroundColor: "#ffffff",
+        scale: 2 // Mayor calidad
+    }).then(canvas => {
+        const link = document.createElement('a');
+        link.download = 'Ticket-Reserva-Oraculo.png';
+        link.href = canvas.toDataURL("image/png");
+        link.click();
+    });
 };
 
 window.renderLanding = async () => {
@@ -188,7 +190,7 @@ window.renderReservaCliente = async () => {
                         </div>
                     </div>
                     <div class="p-3 bg-light d-flex gap-2">
-                        <button class="btn btn-primary w-100" onclick="window.descargarTicket()">DESCARGAR PDF</button>
+                        <button class="btn btn-primary w-100" onclick="window.descargarTicket()">DESCARGAR IMAGEN</button>
                         <button class="btn btn-dark w-100" data-bs-dismiss="modal">CERRAR</button>
                     </div>
                 </div>
